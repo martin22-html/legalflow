@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lexium — Assistant juridique pour cabinets d'avocats</title>
+<meta name="description" content="Lexium analyse vos documents, retrouve l'information dans vos dossiers et cite ses sources. Un assistant pour les avocats, qui laisse la décision au professionnel.">
+<meta name="theme-color" content="#14213a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Lexium — Un assistant juridique qui cite ses sources">
+<meta property="og:description" content="Analyse de documents, recherche dans les dossiers, gestion du cabinet. Créez votre compte pour l'essayer sur vos propres dossiers.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='8' y='8' width='16' height='16' transform='rotate(45 16 16)' fill='none' stroke='%2314213a' stroke-width='2.5'/%3E%3Crect x='12.5' y='12.5' width='7' height='7' transform='rotate(45 16 16)' fill='%2314213a'/%3E%3C/svg%3E">
+<style>
+:root{
+  --ink:#14213a;--ink-2:#33425c;--muted:#5a6678;
+  --paper:#f4f5f2;--white:#fff;--line:#d9ddd6;--line-2:#e7e9e4;
+  --seal:#8a2c38;--seal-bg:#f7eaeb;--seal-soft:#e6b3ba;
+  --hl:#f3df8e;--hl-bg:#fbf3d0;--amber:#7a5200;--steel:#3d5a80;--steel-bg:#e8eef5;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --wrap:1160px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--sans);font-size:16px;line-height:1.6;color:var(--ink);background:var(--white)}
+h1,h2,h3,h4,h5,p,ul,ol,dl,dd,figure,blockquote{margin:0}
+ul,ol{padding:0;list-style:none}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--seal);outline-offset:2px}
+.wrap{width:min(var(--wrap),calc(100% - 48px));margin-inline:auto}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:12px;top:-64px;background:var(--ink);color:#fff;padding:10px 14px;border-radius:4px;z-index:100}
+.skip:focus{top:12px}
+.muted{color:var(--muted)}
+section[id]{scroll-margin-top:76px}
+
+/* ---------- Tactile : pression, cibles, défilement ---------- */
+button,a{-webkit-tap-highlight-color:transparent}
+.btn,.btn-line,.chip,.stat,.nav-item,.src,.tabs button,.menu-btn,.x,.faq summary,.freq-toggle button{touch-action:manipulation}
+.btn,.btn-line,.chip,.stat,.nav-item,.src,.tabs button,.menu-btn,.x{transition:transform .12s cubic-bezier(.2,.8,.2,1),background-color .15s,border-color .15s,color .15s,box-shadow .15s,opacity .15s}
+.btn:active,.btn-line:active,.chip:active,.stat:active,.nav-item:active,.src:active,.tabs button:active,.menu-btn:active,.x:active{transform:scale(.96)}
+.faq summary{transition:opacity .12s}
+.faq summary:active{opacity:.55}
+.pulse{animation:pulse .42s cubic-bezier(.2,.8,.2,1)}
+@keyframes pulse{0%{transform:scale(1)}42%{transform:scale(1.06)}100%{transform:scale(1)}}
+
+/* ---------- Boutons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 22px;border-radius:6px;border:1px solid var(--ink);font-size:15px;font-weight:600;background:var(--white);color:var(--ink);transition:background-color .15s,color .15s,border-color .15s}
+.btn:hover{background:var(--paper)}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{background:#0d1729}
+.btn-sm{min-height:40px;padding:0 16px;font-size:14px}
+.btn-line{min-height:36px;padding:0 12px;border-radius:4px;border:1px solid var(--line);background:var(--white);font-size:13px;font-weight:600}
+.btn-line:hover{background:var(--paper);border-color:var(--ink-2)}
+.btn-line[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* ---------- Navigation ---------- */
+.nav{position:sticky;top:0;z-index:30;height:68px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line-2)}
+.nav-in{height:100%;display:flex;align-items:center;gap:28px}
+.logo{display:inline-flex;align-items:center;gap:13px;font-size:17px;font-weight:650;letter-spacing:.2em}
+.mark{width:22px;height:22px;border:2px solid currentColor;transform:rotate(45deg);position:relative;flex:none;margin-right:2px}
+.mark::after{content:"";position:absolute;inset:4px;background:currentColor}
+.links{display:flex;gap:26px;margin-left:auto;font-size:14px;color:var(--ink-2)}
+.links a{padding:6px 0;border-bottom:1px solid transparent}
+.links a:hover{border-bottom-color:var(--ink)}
+.menu-btn{display:none;margin-left:auto;min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:6px;background:var(--white);font-size:14px}
+
+/* ---------- Titres de section (numérotation d'acte) ---------- */
+.sec{padding:104px 0}
+.sec-paper{background:var(--paper)}
+.sec-dark{background:var(--ink);color:#fff}
+.sec-dark :focus-visible{outline-color:#fff}
+.sec-head{display:grid;grid-template-columns:72px minmax(0,1fr);gap:8px;margin-bottom:52px}
+.rn{font-family:var(--serif);font-size:30px;line-height:1.2;color:var(--seal);font-weight:500}
+.sec-dark .rn{color:var(--seal-soft)}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(30px,3.6vw,46px);line-height:1.12;letter-spacing:-.018em;max-width:20ch}
+.wide-h2{max-width:26ch}
+.lead{font-family:var(--serif);font-size:19px;line-height:1.65;color:var(--ink-2);max-width:62ch;margin-top:18px}
+.sec-dark .lead{color:#c9d3e0}
+
+/* ---------- Hero ---------- */
+.hero{background:var(--paper);padding:84px 0 92px;border-bottom:1px solid var(--line)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;align-items:center}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(38px,4.7vw,62px);line-height:1.06;letter-spacing:-.022em}
+.hero-sub{font-family:var(--serif);font-size:20px;line-height:1.6;color:var(--ink-2);margin-top:22px;max-width:46ch}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.fine{font-size:13px;color:var(--muted);margin-top:16px}
+
+.dossier{background:var(--white);border:1px solid var(--line);border-radius:8px;box-shadow:0 30px 60px -34px rgba(20,33,58,.4);overflow:hidden;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s}
+.dossier:hover{box-shadow:0 42px 84px -30px rgba(20,33,58,.5)}
+.d-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line-2);background:#fbfbfa}
+.d-title{font-family:var(--serif);font-style:italic;font-size:14px}
+.badge{font-size:11.5px;padding:2px 8px;border:1px solid var(--line);border-radius:3px;color:var(--muted);white-space:nowrap;background:var(--white)}
+.badge-real{border-color:var(--steel);color:var(--steel);background:var(--steel-bg)}
+.d-body{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.d-doc{padding:20px 22px;font-family:var(--serif);font-size:13.5px;line-height:1.62;border-right:1px solid var(--line-2)}
+.d-doc h4{font-size:12.5px;margin:0 0 3px;font-weight:700}
+.d-doc section+section{margin-top:13px}
+mark{background:transparent;color:inherit;padding:1px 0;transition:background-color .7s}
+mark.on,html:not(.js) mark{background:var(--hl)}
+.k{display:inline-grid;place-items:center;width:15px;height:15px;margin-left:3px;border-radius:50%;background:var(--seal);color:#fff;font:700 9.5px/1 var(--sans);vertical-align:1px}
+.d-notes{padding:18px;display:grid;gap:12px;align-content:start;background:#fbfbfa}
+.note{border-left:3px solid var(--line);padding:2px 0 2px 12px;font-size:12.5px;line-height:1.5;color:var(--ink-2)}
+.note b{display:flex;align-items:center;gap:6px;color:var(--ink);font-size:13px;margin-bottom:2px}
+.note.high{border-color:var(--seal)}.note.watch{border-color:#c9a227}.note.neg{border-color:var(--steel)}
+.note .k{margin:0}
+.js .note{opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s}
+.js .note.on{opacity:1;transform:none}
+.d-foot{padding:11px 18px;border-top:1px solid var(--line-2);font-size:12.5px;color:var(--muted)}
+
+/* ---------- Constat ---------- */
+.cmp{width:100%;border-collapse:collapse;font-size:15.5px}
+.cmp th,.cmp td{padding:20px 24px 20px 0;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+.cmp thead th{border-top:0;padding-bottom:12px;font-size:13px;font-weight:600;color:var(--muted)}
+.cmp tbody th{font-family:var(--serif);font-size:18px;font-weight:600;width:32%;line-height:1.35}
+.cmp td:nth-child(2){color:var(--muted);width:30%}
+.cmp td:nth-child(3){color:var(--ink)}
+.cmp tbody tr:last-child>*{border-bottom:1px solid var(--line)}
+
+/* ---------- Fonctionnalités ---------- */
+.pillar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:64px;align-items:center;padding:52px 0;border-top:1px solid var(--line)}
+.pillar:first-of-type{border-top:0;padding-top:8px}
+.pillar:nth-of-type(even) .viz{order:-1}
+h3{font-family:var(--serif);font-weight:600;font-size:26px;line-height:1.2;letter-spacing:-.01em}
+.pillar p{margin-top:14px;color:var(--ink-2);max-width:48ch}
+.pillar ul{margin-top:16px;display:grid;gap:8px;font-size:15px;color:var(--ink-2)}
+.pillar li{position:relative;padding-left:22px}
+.pillar li::before,.price li::before{content:"";position:absolute;left:3px;top:.42em;width:6px;height:11px;border:solid currentColor;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.viz{background:var(--white);border:1px solid var(--line);border-radius:8px;padding:24px}
+.chips-row{display:flex;flex-wrap:wrap;gap:8px}
+.ft{font-size:12.5px;font-weight:600;padding:3px 10px;border:1px solid var(--line);border-radius:3px;background:var(--paper);color:var(--ink-2)}
+.kv{margin-top:20px;border-top:1px solid var(--line-2)}
+.kv div{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line-2);font-size:14px}
+.kv dt{color:var(--muted)}
+.kv dd{font-weight:600}
+.src{display:inline-block;font-family:var(--serif);font-style:italic;font-size:12.5px;line-height:1.35;padding:2px 8px;border:1px solid var(--line);border-radius:3px;background:var(--paper);color:var(--ink);font-weight:400;text-align:left}
+.src-ext{display:inline-flex;align-items:center;gap:4px;font-family:var(--serif);font-style:italic;font-size:12.5px;line-height:1.35;padding:2px 8px;margin:2px 6px 6px 0;border:1px solid var(--steel);border-radius:3px;background:var(--steel-bg);color:var(--steel);font-weight:500;text-decoration:none;transition:background-color .15s,color .15s}
+.src-ext:hover{background:var(--steel);color:#fff}
+button.src{cursor:pointer}
+button.src:hover{background:var(--hl-bg);border-color:#c9a227}
+.q{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--ink);border-radius:6px;font-size:14.5px;background:var(--white)}
+.q::before{content:"";flex:none;width:12px;height:12px;border:2px solid var(--ink);border-radius:50%;box-shadow:5px 5px 0 -3px var(--ink)}
+.ans{margin-top:16px;font-size:14.5px;color:var(--ink-2)}
+.ans .src{margin:8px 6px 0 0}
+.ech-mini li{display:grid;grid-template-columns:54px minmax(0,1fr);gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line-2);font-size:14px}
+.ech-mini li:first-child{padding-top:0}
+.ech-mini li:last-child{border-bottom:0;padding-bottom:0}
+.date{display:grid;place-items:center;width:54px;height:54px;border:1px solid var(--line);border-radius:4px;background:var(--paper);text-align:center;line-height:1.1}
+.date b{font-family:var(--serif);font-size:21px;font-weight:600;display:block}
+.date span{font-size:11.5px;color:var(--muted)}
+.also{margin-top:64px;padding-top:36px;border-top:1px solid var(--ink)}
+.also h3{font-size:22px;margin-bottom:22px}
+.also dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:56px}
+.also dl div{padding:16px 0;border-top:1px solid var(--line)}
+.also dt{font-weight:650;font-size:15.5px}
+.also dd{color:var(--ink-2);font-size:14.5px;margin-top:3px}
+.plan{font-size:12px;color:var(--muted);font-weight:400;margin-left:6px}
+
+/* ---------- Démo ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px;margin-bottom:44px}
+.step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:14px}
+.step-n{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--ink);border-radius:50%;font-family:var(--serif);font-weight:600}
+.step h3{font-size:19px}
+.step p{font-size:14.5px;color:var(--ink-2);margin-top:4px}
+.demo-note{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:14px;font-size:14px;color:var(--ink-2)}
+.app{display:grid;grid-template-columns:212px minmax(0,1fr);background:var(--white);border:1px solid var(--line);border-radius:8px;overflow:hidden;box-shadow:0 30px 60px -38px rgba(20,33,58,.45);min-height:600px}
+.side{background:#0e1a2f;color:#b4c0d0;padding:20px 12px;display:flex;flex-direction:column;gap:2px}
+.side :focus-visible{outline-color:#fff}
+.side .dlogo{display:flex;align-items:center;gap:10px;color:#fff;font-size:12.5px;font-weight:650;letter-spacing:.18em;margin:2px 10px 22px}
+.side .mark{width:14px;height:14px;border-width:1.5px}.side .mark::after{inset:3px}
+.nav-item{text-align:left;background:transparent;border:0;border-radius:5px;padding:9px 10px;font-size:13.5px;color:inherit}
+.nav-item:hover{background:#17273f;color:#fff}
+.nav-item[aria-current="page"]{background:#1f3352;color:#fff}
+.nav-item.soon{opacity:.8}
+.main{padding:28px 30px 30px;min-width:0}
+.view{animation:viewIn .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes viewIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.app-dots{display:none;justify-content:center;gap:7px;margin-top:14px}
+.app-dots .dot{width:6px;height:6px;border-radius:50%;background:var(--line);transition:transform .25s,background-color .25s}
+.app-dots .dot.on{background:var(--ink);transform:scale(1.35)}
+.view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
+.view-head h3{font-size:24px}
+.view-head p{font-size:13.5px;margin-top:2px}
+.avatar{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:50%;background:var(--steel-bg);color:var(--steel);font-size:12px;font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:26px}
+.stat{display:flex;flex-direction:column;gap:2px;text-align:left;padding:14px;border:1px solid var(--line);border-radius:6px;background:var(--white);font-size:12.5px;color:var(--muted)}
+.stat:hover{border-color:var(--ink-2);background:var(--paper)}
+.stat-n{font-family:var(--serif);font-size:32px;font-weight:600;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px}
+.dstatus{font-size:12px;font-weight:600;padding:1px 8px;border-radius:3px;white-space:nowrap;display:inline-block}
+.dstatus-active{color:var(--steel);background:var(--steel-bg)}
+.dstatus-closed{color:var(--muted);background:var(--line-2)}
+.jhead{margin-bottom:6px}
+.jcard{padding:18px 0;border-top:1px solid var(--line)}
+.jcard:first-of-type{border-top:0}
+.jtag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:2px 8px;border-radius:3px;margin-bottom:8px}
+.jtag-texte{background:var(--paper);color:var(--ink-2)}
+.jtag-juris{background:var(--steel-bg);color:var(--steel)}
+.jtag-interne{background:var(--hl-bg);color:var(--amber)}
+.jcard h5{font-family:var(--serif);font-size:17px;font-weight:600;margin-bottom:6px;line-height:1.3}
+.jcard p{font-size:14px;color:var(--ink-2);margin-bottom:10px;line-height:1.55}
+.jcard .jmeta{font-size:12px;color:var(--muted);margin:-4px 0 10px}
+.two h4,.h4{font-size:14px;font-weight:650;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.rows li{padding:11px 0;border-bottom:1px solid var(--line-2);font-size:14px;line-height:1.45}
+.rows small{display:block;color:var(--muted);font-size:12.5px}
+.tag{display:inline-block;margin-top:5px;padding:1px 8px;border-radius:3px;background:var(--steel-bg);color:var(--steel);font-size:12px;font-weight:600}
+.ask{margin-top:26px;padding:16px 18px;background:var(--paper);border:1px solid var(--line);border-radius:6px}
+.ask p{font-size:14.5px;margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--white);font-size:13.5px;text-align:left}
+.chip:hover{border-color:var(--ink);background:var(--hl-bg)}
+table.docs{width:100%;border-collapse:collapse;font-size:14px}
+.docs th{text-align:left;font-size:12.5px;font-weight:600;color:var(--muted);padding:0 12px 8px 0;border-bottom:1px solid var(--ink)}
+.docs td{padding:11px 12px 11px 0;border-bottom:1px solid var(--line-2);vertical-align:middle}
+.docs td:first-child{font-weight:600}
+.st{font-size:12px;font-weight:600;color:var(--amber);background:var(--hl-bg);padding:1px 8px;border-radius:3px;white-space:nowrap}
+.back{margin-bottom:16px}
+.an-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;align-items:start}
+.contract{position:relative;max-height:520px;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:22px 24px;border:1px solid var(--line);border-radius:6px;background:#fdfdfc;font-family:var(--serif);font-size:14.5px;line-height:1.7;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.contract::-webkit-scrollbar{width:8px}
+.contract::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.contract::-webkit-scrollbar-thumb:hover{background:var(--ink-2)}
+.contract h4{font-size:16px;margin-bottom:6px}
+.contract h5{font-size:14px;margin:18px 0 2px}
+.contract mark{background:var(--hl)}
+.contract mark.flash{background:#e0b92e}
+.finding{padding:16px 0;border-bottom:1px solid var(--line-2)}
+.finding:first-child{padding-top:0}
+.finding header{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-bottom:6px}
+.finding h5{font-family:var(--serif);font-size:16.5px;line-height:1.3}
+.finding p{font-size:13.5px;color:var(--ink-2);margin-top:5px}
+.finding p b{color:var(--ink)}
+.lvl{font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:3px;white-space:nowrap}
+.lvl-high{background:var(--seal-bg);color:var(--seal)}
+.lvl-watch{background:var(--hl-bg);color:var(--amber)}
+.lvl-neg{background:var(--steel-bg);color:var(--steel)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.conf{margin-top:14px;font-size:13px;color:var(--muted)}
+.an-tools{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-bottom:16px}
+.loading{padding:60px 0;text-align:center;color:var(--muted)}
+.loading::before{content:"";display:block;width:26px;height:26px;margin:0 auto 14px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chat-log{max-height:400px;min-height:230px;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:grid;gap:14px;align-content:start;padding:2px 4px 2px 0;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.chat-log::-webkit-scrollbar{width:8px}
+.chat-log::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.msg{max-width:88%;font-size:14.5px;line-height:1.6}
+.msg.user{justify-self:end;background:var(--paper);border:1px solid var(--line);border-radius:10px 10px 2px 10px;padding:9px 14px}
+.msg.bot{border-left:3px solid var(--ink);padding-left:14px}
+.msg .who{font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:3px}
+.msg ol{list-style:decimal;padding-left:20px;display:grid;gap:10px;margin:8px 0}
+.msg ul{list-style:disc;padding-left:20px;display:grid;gap:8px;margin:8px 0}
+.msg li .src,.msg p .src{margin:4px 4px 0 0}
+.msg p+p{margin-top:8px}
+.msg blockquote{margin:8px 0 6px;padding:2px 0 2px 14px;border-left:2px solid var(--line);font-family:var(--serif);font-style:italic}
+.typing{display:inline-flex;align-items:center;gap:5px;height:20px}
+.typing .tdot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:tbounce 1.1s infinite ease-in-out}
+.typing .tdot:nth-child(2){animation-delay:.15s}
+.typing .tdot:nth-child(3){animation-delay:.3s}
+@keyframes tbounce{0%,60%,100%{transform:translateY(0);opacity:.45}30%{transform:translateY(-5px);opacity:1}}
+.chat-form{display:flex;gap:8px;margin-top:16px}
+.chat-form input{flex:1;min-width:0;padding:0 14px;min-height:46px;border:1px solid var(--ink);border-radius:6px;background:var(--white)}
+.chat-hint{font-size:12.5px;color:var(--muted);margin-top:10px}
+.ech-day{margin-bottom:22px}
+.ech-day h4{text-transform:capitalize}
+.ech-empty{padding:12px 14px;border:1px dashed var(--line);border-radius:6px;font-size:13.5px;color:var(--muted)}
+
+/* ---------- Sécurité ---------- */
+.sec-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px}
+.sec-list div{padding:20px 0;border-top:1px solid #34435d}
+.sec-list div:last-child{border-bottom:1px solid #34435d}
+.sec-list dt{font-family:var(--serif);font-size:19px;font-weight:600}
+.sec-list dd{color:#c9d3e0;font-size:15px;margin-top:4px}
+.sec-foot{margin-top:28px;font-size:14px;color:#aebbd0;max-width:52ch}
+
+/* ---------- Tarifs ---------- */
+.freq-toggle{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;gap:2px;padding:4px;margin-bottom:28px;border:1px solid var(--line);border-radius:999px;background:var(--paper)}
+.freq-toggle button{position:relative;z-index:1;min-height:40px;padding:0 18px;border:0;border-radius:999px;background:transparent;font-size:14px;font-weight:600;color:var(--ink-2);display:flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap}
+.freq-toggle button[aria-checked="true"]{color:var(--white)}
+.freq-toggle .save{font-size:11.5px;font-weight:700;color:var(--seal);background:var(--seal-bg);padding:1px 6px;border-radius:999px}
+.freq-toggle button[aria-checked="true"] .save{color:var(--white);background:rgba(255,255,255,.2)}
+.freq-thumb{position:absolute;z-index:0;top:4px;left:4px;width:calc(50% - 4px);height:calc(100% - 8px);border-radius:999px;background:var(--ink);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.bill-note{margin:-8px 0 18px;font-size:12.5px;color:var(--muted)}
+.price.dark .bill-note{color:#b8c4d6}
+.pricing{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;max-width:880px}
+.price{display:flex;flex-direction:column;padding:34px;border:1px solid var(--line);border-radius:8px;background:var(--white)}
+.price.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.price.dark :focus-visible{outline-color:#fff}
+.price h3{font-size:24px}
+.price .who{font-size:14px;color:var(--muted);margin-top:2px}
+.price.dark .who{color:#b8c4d6}
+.amount{font-family:var(--serif);font-size:44px;font-weight:600;line-height:1;margin:22px 0 4px;font-variant-numeric:tabular-nums}
+.amount small{font-family:var(--sans);font-size:14px;font-weight:400;color:var(--muted)}
+.price.dark .amount small{color:#b8c4d6}
+.price ul{display:grid;gap:9px;margin:22px 0 28px;font-size:14.5px;flex:1}
+.price li{position:relative;padding-left:22px;color:var(--ink-2)}
+.price.dark li{color:#dbe3ee}
+.price .btn{width:100%}
+.price.dark .btn{background:#fff;color:var(--ink);border-color:#fff}
+.price.dark .btn:hover{background:var(--paper)}
+.pricing-note{margin-top:20px;font-size:14px;color:var(--muted)}
+
+/* ---------- FAQ ---------- */
+.faq{max-width:820px}
+.faq details{border-top:1px solid var(--line)}
+.faq details:last-child{border-bottom:1px solid var(--line)}
+.faq summary{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px 0;cursor:pointer;list-style:none;font-family:var(--serif);font-size:18px;font-weight:600;line-height:1.35}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";flex:none;font-family:var(--sans);font-size:22px;font-weight:300;line-height:1}
+.faq details[open] summary::after{content:"\2212"}
+.faq p{padding:0 40px 22px 0;color:var(--ink-2);max-width:66ch}
+
+/* ---------- Conclusion ---------- */
+.cta{padding:100px 0;text-align:center}
+.cta .pre{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--seal)}
+.cta .rule{width:96px;height:1px;background:var(--ink);margin:16px auto 22px}
+.cta h2{max-width:22ch;margin-inline:auto}
+.cta p.cta-txt{margin:18px auto 0;max-width:52ch;color:var(--ink-2);font-family:var(--serif);font-size:19px}
+.cta .btn{margin-top:30px}
+.reserve{margin-top:46px;text-align:right;font-family:var(--serif);font-style:italic;font-size:14px;color:var(--muted)}
+
+/* ---------- Pied de page ---------- */
+footer{background:#0b1424;color:#9aa8bb;padding:54px 0 36px}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px}
+.foot-grid .logo{color:#fff}
+.foot-grid p{font-size:14px;margin-top:14px;max-width:34ch}
+.foot-grid h4{color:#fff;font-size:14px;margin-bottom:10px}
+.foot-grid a{display:block;font-size:14px;padding:5px 0}
+.foot-grid a:hover{color:#fff}
+footer :focus-visible{outline-color:#fff}
+.copy{margin-top:38px;padding-top:20px;border-top:1px solid #1d2a40;font-size:12.5px}
+
+/* ---------- Dialogue et toast ---------- */
+dialog{border:0;padding:0;border-radius:10px;width:min(440px,calc(100% - 32px));box-shadow:0 30px 80px rgba(0,0,0,.35);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+dialog::backdrop{background:rgba(10,18,32,.62)}
+.dlg{padding:28px;position:relative}
+.sheet-handle{display:none}
+.dlg .x{position:absolute;right:12px;top:10px;width:40px;height:40px;border:0;background:none;font-size:26px;line-height:1;color:var(--muted)}
+.tabs{display:flex;gap:4px;margin:20px 0 6px;padding:4px;background:var(--paper);border-radius:8px}
+.tabs button{flex:1;border:0;padding:9px;border-radius:5px;background:transparent;font-size:14px}
+.tabs button[aria-selected="true"]{background:var(--white);box-shadow:0 1px 4px rgba(20,33,58,.15);font-weight:600}
+.form label{display:block;margin-top:14px;font-size:13px;color:var(--muted)}
+.form input{display:block;width:100%;min-height:44px;margin-top:4px;padding:0 12px;border:1px solid var(--line);border-radius:6px;color:var(--ink);background:var(--white)}
+.form .btn{width:100%;margin-top:20px}
+.err{margin-top:12px;font-size:13.5px;color:var(--seal)}
+.form-note{margin-top:14px;font-size:12.5px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:60;max-width:min(520px,calc(100% - 32px));padding:12px 18px;border-radius:6px;background:var(--ink);color:#fff;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- Responsive ---------- */
+@media(max-width:1020px){
+  .hero-grid{grid-template-columns:1fr}
+  .d-body{grid-template-columns:1fr}
+  .d-doc{border-right:0;border-bottom:1px solid var(--line-2)}
+  .pillar{grid-template-columns:1fr;gap:28px}
+  .pillar:nth-of-type(even) .viz{order:0}
+  .sec-grid{grid-template-columns:1fr;gap:36px}
+  .an-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:900px){
+  .menu-btn{display:inline-flex;align-items:center}
+  .links{display:none;position:absolute;top:68px;left:0;right:0;flex-direction:column;gap:0;margin:0;padding:8px 24px 16px;background:var(--white);border-bottom:1px solid var(--line)}
+  .links.open{display:flex}
+  .links a{padding:13px 0;border-bottom:1px solid var(--line-2);font-size:16px}
+  .nav-in{gap:12px}
+  .app{grid-template-columns:1fr}
+  .app-dots{display:flex}
+  .side{flex-direction:row;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:10px;gap:4px}
+  .side::-webkit-scrollbar{display:none}
+  .side .dlogo{display:none}
+  .nav-item{white-space:nowrap}
+  .steps{grid-template-columns:1fr;gap:22px}
+  .pricing{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .also dl{grid-template-columns:1fr}
+  .two{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .cmp thead{display:none}
+  .cmp tr{display:block;padding:20px 0;border-top:1px solid var(--line)}
+  .cmp tbody tr:last-child{border-bottom:1px solid var(--line)}
+  .cmp th,.cmp td,.cmp tbody th{display:block;width:auto;padding:2px 0;border:0}
+  .cmp tbody tr:last-child>*{border:0}
+  .cmp td{margin-top:8px}
+  .cmp td::before{content:attr(data-l);display:block;font-size:12px;font-weight:600;color:var(--muted)}
+  .docs thead{display:none}
+  .docs tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:12px 0;border-bottom:1px solid var(--line-2)}
+  .docs td{border:0;padding:0}
+  .docs td:nth-child(2),.docs td:nth-child(3){grid-column:1;color:var(--muted);font-size:13px}
+  .docs td:nth-child(4){grid-column:2;grid-row:1}
+  .docs td:nth-child(5){grid-column:2;grid-row:2}
+}
+@media(max-width:560px){
+  .wrap{width:min(var(--wrap),calc(100% - 32px))}
+  .sec{padding:72px 0}
+  .hero{padding:56px 0 64px}
+  .sec-head{grid-template-columns:1fr;gap:0;margin-bottom:36px}
+  .main{padding:22px 16px}
+  .foot-grid{grid-template-columns:1fr}
+  .kv div{grid-template-columns:1fr;gap:2px}
+  .stats{gap:8px}
+  .msg{max-width:100%}
+  .price{padding:26px}
+  .hero-sub,.lead{font-size:17.5px}
+  .logo{letter-spacing:.14em}
+  dialog#auth{position:fixed;inset:auto 0 0 0;margin:0;width:100%;max-width:none;max-height:88vh;border-radius:16px 16px 0 0;overflow:auto}
+  .sheet-handle{display:block;width:40px;height:4px;padding:0;margin:0 auto 16px;border:0;border-radius:2px;background:var(--line)}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body id="top">
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="logo" href="#top" aria-label="Lexium, retour en haut de page"><span class="mark" aria-hidden="true"></span>LEXIUM</a>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu">Menu</button>
+    <nav class="links" id="menu" aria-label="Navigation principale">
+      <a href="#fonctionnalites">Fonctionnalités</a>
+      <a href="#demo">Démo</a>
+      <a href="#securite">Sécurité</a>
+      <a href="#tarifs">Tarifs</a>
+      <a href="#faq">Questions</a>
+    </nav>
+    <button class="btn btn-primary btn-sm" data-auth="login">Se connecter</button>
+  </div>
+</header>
+
+<main id="contenu">
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <h1>Un assistant juridique qui cite ses sources.</h1>
+      <p class="hero-sub">Lexium lit vos documents, retrouve l'information dans vos dossiers et prépare vos analyses. Vous vérifiez, vous décidez.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#demo" data-godemo>Explorer la démo</a>
+        <a class="btn" href="#fonctionnalites">Voir les fonctionnalités</a>
+      </div>
+      <p class="fine">Créez votre compte pour l'essayer sur vos propres dossiers.</p>
+    </div>
+
+    <figure class="dossier" aria-label="Exemple d'analyse d'un contrat fictif">
+      <div class="d-head">
+        <span class="d-title">Pièce n° 1 : Contrat de maintenance</span>
+        <span class="badge">Données fictives</span>
+      </div>
+      <div class="d-body">
+        <div class="d-doc">
+          <section>
+            <h4>Article 4 : Prix</h4>
+            <p>Le prix annuel de la maintenance est fixé à 48 000 € HT.</p>
+          </section>
+          <section>
+            <h4>Article 9 : Retard d'intervention</h4>
+            <p>En cas de retard, le Prestataire verse au Client <mark data-k="a">une pénalité de 5 % du prix annuel par jour de retard, sans plafond</mark><span class="k" aria-hidden="true">a</span>.</p>
+          </section>
+          <section>
+            <h4>Article 12 : Durée</h4>
+            <p>Le contrat est <mark data-k="b">reconduit tacitement pour trois ans</mark><span class="k" aria-hidden="true">b</span>, sauf dénonciation six mois avant le terme.</p>
+          </section>
+          <section>
+            <h4>Article 14 : Résiliation</h4>
+            <p>Le Client peut <mark data-k="c">résilier à tout moment, sans préavis ni indemnité</mark><span class="k" aria-hidden="true">c</span>.</p>
+          </section>
+        </div>
+        <ol class="d-notes">
+          <li class="note high" data-k="a"><b><span class="k">a</span>Pénalité sans plafond</b>2 400 € par jour : le prix annuel est atteint en 20 jours. Le juge peut modérer une pénalité manifestement excessive (art. 1231-5 C. civ.).</li>
+          <li class="note watch" data-k="b"><b><span class="k">b</span>Reconduction tacite</b>Dénonciation à notifier avant le 30 juin 2027. Proposée pour vos échéances.</li>
+          <li class="note neg" data-k="c"><b><span class="k">c</span>Résiliation non réciproque</b>Aucune faculté équivalente pour le Prestataire. À négocier.</li>
+        </ol>
+      </div>
+      <figcaption class="d-foot">Analyse pour Nova Services, le Prestataire. Chaque point renvoie à son article.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ================= I. CONSTAT ================= -->
+<section class="sec" id="constat">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="rn" aria-hidden="true">I.</span>
+      <div>
+        <h2 class="wide-h2">Le jugement de l'avocat ne se délègue pas. La préparation, si.</h2>
+        <p class="lead">Documents, recherches, emails, échéances : les cabinets jonglent entre plusieurs outils pour préparer ce qui précède la décision. Lexium rassemble ces tâches dans un seul espace.</p>
+      </div>
+    </div>
+    <table class="cmp">
+      <caption class="sr-only">Quatre tâches du cabinet, avec et sans Lexium</caption>
+      <thead><tr><th scope="col">La tâche</th><th scope="col">Aujourd'hui</th><th scope="col">Avec Lexium</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Relire un contrat de plusieurs dizaines de pages</th><td data-l="Aujourd'hui">Lecture intégrale, notes à la main, clauses à retrouver.</td><td data-l="Avec Lexium">Les clauses à risque sont repérées et renvoyées à leur article.</td></tr>
+        <tr><th scope="row">Retrouver l'email où le client a donné son accord</th><td data-l="Aujourd'hui">Recherche dans la messagerie, puis dans les pièces jointes.</td><td data-l="Avec Lexium">Une question. La réponse cite l'email et la pièce concernés.</td></tr>
+        <tr><th scope="row">Suivre les délais et les échéances</th><td data-l="Aujourd'hui">Report manuel depuis les courriers, les emails et les avis.</td><td data-l="Avec Lexium">Les délais repérés rejoignent un agenda unique.</td></tr>
+        <tr><th scope="row">Préparer un compte rendu de rendez-vous</th><td data-l="Aujourd'hui">Réécriture des notes après le rendez-vous.</td><td data-l="Avec Lexium">Un premier jet structuré, à relire et corriger.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= II. FONCTIONNALITÉS ================= -->
+<section class="sec sec-paper" id="fonctionnalites">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="rn" aria-hidden="true">II.</span>
+      <div>
+        <h2>Tout votre cabinet, au même endroit.</h2>
+        <p class="lead">Trois fonctions structurent Lexium. Les autres outils restent accessibles depuis le même espace.</p>
+      </div>
+    </div>
+
+    <article class="pillar">
+      <div>
+        <h3>Analyse de documents</h3>
+        <p>Importez PDF, Word, Excel, PowerPoint, images ou fichiers texte. Lexium repère les parties, les montants, les dates et les clauses sensibles, et renvoie chaque information à son emplacement dans le document.</p>
+        <ul><li>Une note d'analyse à copier dans votre dossier</li><li>Les échéances proposées pour votre agenda</li></ul>
+      </div>
+      <div class="viz">
+        <div class="chips-row" aria-label="Formats acceptés"><span class="ft">PDF</span><span class="ft">Word</span><span class="ft">Excel</span><span class="ft">PowerPoint</span><span class="ft">Image</span><span class="ft">Texte</span></div>
+        <dl class="kv">
+          <div><dt>Parties</dt><dd>Horizon Industries SAS, Nova Services SARL</dd><dd><span class="src">Préambule</span></dd></div>
+          <div><dt>Prix</dt><dd>48 000 € HT par an</dd><dd><span class="src">Art. 4</span></dd></div>
+          <div><dt>Durée</dt><dd>3 ans, reconduction tacite</dd><dd><span class="src">Art. 12</span></dd></div>
+          <div><dt>Clauses à risque</dt><dd>3 points repérés</dd><dd><span class="src">Art. 9, 12, 14</span></dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <article class="pillar">
+      <div>
+        <h3>Recherche intelligente</h3>
+        <p>Posez la question comme à un collaborateur. La réponse cite la pièce, l'email ou le texte dont elle provient : vous vérifiez en un clic avant d'utiliser l'information.</p>
+        <ul><li>Recherche dans l'ensemble de vos dossiers</li><li>Sources juridiques avec leurs références</li></ul>
+      </div>
+      <div class="viz">
+        <div class="q">Où Mme Marchand a-t-elle validé le devis ?</div>
+        <div class="ans">
+          <p>Par email le 12 mars 2026, pour 1 850 € HT. Le montant correspond au devis signé.</p>
+          <span class="src">Email du 12 mars 2026</span><span class="src">Pièce n° 3 : Devis n° 2026-031 signé</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="pillar">
+      <div>
+        <h3>Gestion du cabinet</h3>
+        <p>Dossiers, échéances, emails, comptes-rendus et statistiques sont réunis dans un tableau de bord centralisé. Ce qui presse apparaît en premier.</p>
+        <ul><li>Un agenda alimenté par vos documents et vos emails</li><li>Un suivi partagé pour toute l'équipe</li></ul>
+      </div>
+      <div class="viz">
+        <ul class="ech-mini">
+          <li><span class="date"><b>21</b><span>sept.</span></span><span>Conclusions en réplique<br><span class="muted">Marchand c/ SCI Les Tilleuls</span></span></li>
+          <li><span class="date"><b>23</b><span>sept.</span></span><span>Audience de mise en état<br><span class="muted">Marchand c/ SCI Les Tilleuls</span></span></li>
+          <li><span class="date"><b>25</b><span>sept.</span></span><span>Communication des pièces<br><span class="muted">Succession Lefèvre</span></span></li>
+        </ul>
+      </div>
+    </article>
+
+    <div class="also">
+      <h3>Et aussi, depuis le même espace</h3>
+      <dl>
+        <div><dt>Aide à la rédaction<span class="plan">Pro et Cabinet</span></dt><dd>Premiers jets d'actes et de courriers à partir des pièces du dossier, à relire et corriger.</dd></div>
+        <div><dt>Recherche juridique<span class="plan">Pro et Cabinet</span></dt><dd>Sources juridiques avec leurs références, à vérifier avant de les citer.</dd></div>
+        <div><dt>Échéances et emails<span class="plan">Pro et Cabinet</span></dt><dd>Les délais repérés dans vos messages et vos documents rejoignent votre agenda.</dd></div>
+        <div><dt>Comptes-rendus de rendez-vous<span class="plan">Cabinet</span></dt><dd>Notes structurées à partir de vos échanges avec le client.</dd></div>
+        <div><dt>Statistiques et droits d'accès<span class="plan">Cabinet</span></dt><dd>Suivi de l'activité et gestion des droits, utilisateur par utilisateur.</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ================= III. DÉMO ================= -->
+<section class="sec" id="demo">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="rn" aria-hidden="true">III.</span>
+      <div>
+        <h2 class="wide-h2">Essayez Lexium sur vos propres dossiers.</h2>
+        <p class="lead">Créez un dossier, importez un document, posez une question à l'assistant. Vos données restent privées et rattachées à votre seul compte.</p>
+      </div>
+    </div>
+
+    <ol class="steps">
+      <li class="step"><span class="step-n" aria-hidden="true">1</span><div><h3>Créez un dossier</h3><p>Puis importez un premier document, en PDF ou en texte collé.</p></div></li>
+      <li class="step"><span class="step-n" aria-hidden="true">2</span><div><h3>Demandez</h3><p>Posez votre question, demandez une analyse ou lancez une recherche.</p></div></li>
+      <li class="step"><span class="step-n" aria-hidden="true">3</span><div><h3>Exploitez</h3><p>Obtenez une réponse structurée, avec les éléments du dossier et les sources utilisées.</p></div></li>
+    </ol>
+
+    <div class="app">
+      <nav class="side" aria-label="Sections de la démo">
+        <div class="dlogo"><span class="mark" aria-hidden="true"></span>LEXIUM</div>
+        <button class="nav-item" data-view="dash" aria-current="page">Tableau de bord</button>
+        <button class="nav-item" data-view="dossiers">Mes dossiers</button>
+        <button class="nav-item" data-view="docs">Documents</button>
+        <button class="nav-item" data-view="recherche">Recherche juridique</button>
+        <button class="nav-item soon" data-soon="Rédaction">Rédaction</button>
+        <button class="nav-item" data-view="ask">Assistant Lexium</button>
+        <button class="nav-item" data-view="ech">Échéances</button>
+        <button class="nav-item" data-view="carpa">CARPA</button>
+        <button class="nav-item soon" data-soon="Emails">Emails</button>
+        <button class="nav-item soon" data-soon="Statistiques">Statistiques</button>
+        <button class="nav-item soon" data-soon="Paramètres">Paramètres</button>
+      </nav>
+
+      <div class="main" id="appMain" tabindex="-1">
+        <!-- Tableau de bord -->
+        <section class="view" id="view-dash" aria-label="Tableau de bord"></section>
+
+        <!-- Mes dossiers -->
+        <section class="view" id="view-dossiers" aria-label="Mes dossiers" hidden>
+          <div id="dossierList">
+            <div class="view-head"><div><h3>Mes dossiers</h3><p class="muted" id="dossierCount">Chargement…</p></div><button class="btn btn-primary btn-sm" type="button" id="newDossierBtn">+ Nouveau dossier</button></div>
+            <form class="chat-form" id="newDossierForm" hidden style="margin-bottom:18px">
+              <label class="sr-only" for="newDossierNom">Nom du dossier</label>
+              <input id="newDossierNom" type="text" autocomplete="off" placeholder="Nom du dossier (ex. Nom c/ Nom)" required>
+              <label class="sr-only" for="newDossierNature">Nature</label>
+              <input id="newDossierNature" type="text" autocomplete="off" placeholder="Nature (optionnel)" style="max-width:220px">
+              <button class="btn btn-primary" type="submit">Créer</button>
+            </form>
+            <table class="docs">
+              <thead><tr><th scope="col">Dossier</th><th scope="col">Nature</th><th scope="col">Statut</th><th scope="col"><span class="sr-only">Action</span></th></tr></thead>
+              <tbody id="dossierRows"></tbody>
+            </table>
+            <p class="muted" id="dossierEmpty" hidden style="margin-top:18px">Aucun dossier pour l'instant. Créez le premier avec le bouton ci-dessus.</p>
+          </div>
+          <div id="dossierDetail" hidden>
+            <button class="btn-line back" id="backDossiers">Retour aux dossiers</button>
+            <div id="dossierDetailBody"></div>
+          </div>
+        </section>
+
+        <!-- Documents -->
+        <section class="view" id="view-docs" aria-label="Documents" hidden>
+          <div id="docList">
+            <div class="view-head"><div><h3>Documents</h3><p class="muted" id="docCount">Chargement…</p></div><span class="avatar" aria-hidden="true">MD</span></div>
+            <table class="docs">
+              <thead><tr><th scope="col">Document</th><th scope="col">Dossier</th><th scope="col">Type</th><th scope="col">Statut</th><th scope="col"><span class="sr-only">Action</span></th></tr></thead>
+              <tbody id="docRows"></tbody>
+            </table>
+            <p class="muted" id="docEmpty" hidden style="margin-top:18px">Aucun document pour l'instant. Ouvrez un dossier pour en ajouter un.</p>
+          </div>
+          <div id="docAn" hidden>
+            <button class="btn-line back" id="backDocs">Retour aux documents</button>
+            <div id="anLoad" class="loading" role="status" hidden>Lexium lit le document…</div>
+            <div id="anBody" hidden></div>
+          </div>
+        </section>
+
+        <!-- Recherche juridique -->
+        <section class="view" id="view-recherche" aria-label="Recherche juridique" hidden>
+          <div class="view-head"><div><h3>Recherche juridique</h3><p class="muted">Textes et jurisprudence, avec leur référence à vérifier avant de citer.</p></div><span class="avatar" aria-hidden="true">MD</span></div>
+          <form class="chat-form" id="jurisForm">
+            <label class="sr-only" for="jurisInput">Votre recherche</label>
+            <input id="jurisInput" type="text" autocomplete="off" placeholder="Rechercher un texte ou une décision…">
+            <button class="btn btn-primary" type="submit">Rechercher</button>
+          </form>
+          <div class="chips" style="margin-top:14px" id="jurisChips">
+            <button class="chip" data-juris="penalite">Pénalité manifestement excessive</button>
+            <button class="chip" data-juris="reconduction">Reconduction tacite</button>
+            <button class="chip" data-juris="desequilibre">Clause déséquilibrée entre les parties</button>
+          </div>
+          <div id="jurisResults"><p class="muted" style="margin-top:18px">Choisissez une recherche ci-dessus, ou tapez la vôtre.</p></div>
+        </section>
+
+        <!-- Assistant -->
+        <section class="view" id="view-ask" aria-label="Assistant Lexium" hidden>
+          <div class="view-head"><div><h3>Assistant Lexium</h3><p class="muted">Interrogez vos dossiers. Chaque réponse s'appuie sur vos documents réels.</p></div><span class="avatar" aria-hidden="true">MD</span></div>
+          <div class="chat-log" id="chatLog" role="log" aria-live="polite" aria-label="Conversation">
+            <div class="msg bot"><p class="who">Lexium</p><p id="askGreeting">Bonjour. Posez une question sur vos dossiers.</p></div>
+          </div>
+          <div class="chips" style="margin-top:16px" id="askChips"></div>
+          <form class="chat-form" id="chatForm">
+            <label class="sr-only" for="chatInput">Votre question</label>
+            <input id="chatInput" type="text" autocomplete="off" placeholder="Posez votre question…">
+            <button class="btn btn-primary" type="submit">Envoyer</button>
+          </form>
+          <p class="chat-hint">Chaque réponse s'appuie sur les documents déjà importés dans vos dossiers.</p>
+        </section>
+
+        <!-- Échéances -->
+        <section class="view" id="view-ech" aria-label="Échéances" hidden></section>
+        <section class="view" id="view-carpa" aria-label="CARPA" hidden></section>
+      </div>
+    </div>
+    <div class="app-dots" aria-hidden="true">
+      <span class="dot on" data-dot="dash"></span><span class="dot" data-dot="dossiers"></span><span class="dot" data-dot="docs"></span><span class="dot" data-dot="recherche"></span><span class="dot" data-dot="ask"></span><span class="dot" data-dot="ech"></span><span class="dot" data-dot="carpa"></span>
+    </div>
+    <p class="fine sr-only" id="swipeHint">Sur mobile, balayez l&#8217;écran à gauche ou à droite pour changer de section.</p>
+  </div>
+</section>
+
+<!-- ================= IV. SÉCURITÉ ================= -->
+<section class="sec sec-dark" id="securite">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="rn" aria-hidden="true">IV.</span>
+      <div>
+        <h2 class="wide-h2">Vos dossiers restent confidentiels.</h2>
+      </div>
+    </div>
+    <div class="sec-grid">
+      <div>
+        <p class="lead" style="margin-top:0">Les correspondances échangées entre l'avocat et son client sont couvertes par le secret professionnel (article 66-5 de la loi du 31 décembre 1971). Lexium est conçu autour de cette exigence : protection des données, hébergement en Europe, chiffrement et contrôle des accès.</p>
+        <p class="sec-foot">Version de travail : les engagements ci-contre sont l'objectif de conception, pas encore un état vérifié. N'y déposez pas de données réelles de client tant que l'hébergement et le chiffrement n'ont pas été formellement validés.</p>
+      </div>
+      <dl class="sec-list">
+        <div><dt>Protection des données</dt><dd>Les données du cabinet restent sous le contrôle du cabinet. La confidentialité est pensée dès la conception.</dd></div>
+        <div><dt>Hébergement en Europe</dt><dd>Vos données sont conservées dans un environnement européen.</dd></div>
+        <div><dt>Chiffrement</dt><dd>Les échanges et les données sensibles sont chiffrés.</dd></div>
+        <div><dt>Accès contrôlés</dt><dd>Chaque utilisateur accède uniquement aux dossiers qui lui sont ouverts.</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ================= V. TARIFS ================= -->
+<section class="sec" id="tarifs">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="rn" aria-hidden="true">V.</span>
+      <div><h2 class="wide-h2">Deux offres, selon la taille de votre cabinet.</h2></div>
+    </div>
+
+    <div class="freq-toggle" role="radiogroup" aria-label="Fréquence de facturation">
+      <span class="freq-thumb" aria-hidden="true"></span>
+      <button type="button" role="radio" aria-checked="true" data-freq="m">Mensuel</button>
+      <button type="button" role="radio" aria-checked="false" data-freq="a">Annuel<span class="save">&minus;15 %</span></button>
+    </div>
+
+    <div class="pricing">
+      <article class="price">
+        <h3>Lexium Pro</h3>
+        <p class="who">Pour un avocat, seul.</p>
+        <p class="amount" id="proAmount">99 €<small> HT / mois</small></p>
+        <p class="bill-note" id="proNote" hidden>Facturé annuellement, soit 1&#8239;009,80&nbsp;€&nbsp;HT.</p>
+        <ul>
+          <li>Analyse de documents</li><li>Recherche dans les dossiers</li><li>Assistant IA</li><li>Recherche juridique</li><li>Aide à la rédaction</li><li>Échéances et emails</li><li>1 utilisateur</li>
+        </ul>
+        <button class="btn btn-primary" data-auth="signup">Choisir Pro</button>
+      </article>
+      <article class="price dark">
+        <h3>Lexium Cabinet</h3>
+        <p class="who">Pour une équipe, jusqu'à 10 utilisateurs.</p>
+        <p class="amount" id="cabAmount">299 €<small> HT / mois</small></p>
+        <p class="bill-note" id="cabNote" hidden>Facturé annuellement, soit 3&#8239;049,80&nbsp;€&nbsp;HT.</p>
+        <ul>
+          <li>Tout Lexium Pro</li><li>Jusqu'à 10 utilisateurs</li><li>Gestion centralisée des dossiers</li><li>Recherche dans tous les dossiers</li><li>Comptes-rendus de rendez-vous</li><li>Statistiques et droits utilisateurs</li><li>Support prioritaire</li>
+        </ul>
+        <button class="btn" data-auth="signup">Choisir Cabinet</button>
+      </article>
+    </div>
+    <p class="pricing-note">Grands cabinets : offre sur devis. Tarifs HT, hors engagement.</p>
+  </div>
+</section>
+
+<!-- ================= VI. FAQ ================= -->
+<section class="sec sec-paper" id="faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="rn" aria-hidden="true">VI.</span>
+      <div><h2>Questions fréquentes</h2></div>
+    </div>
+    <div class="faq">
+      <details><summary>Lexium remplace-t-il un avocat ?</summary><p>Non. Lexium est un outil d'assistance destiné aux professionnels du droit. Il ne se substitue pas à leur jugement : c'est l'avocat qui vérifie, décide et signe.</p></details>
+      <details><summary>Lexium peut-il se tromper ?</summary><p>Oui, comme tout assistant fondé sur l'intelligence artificielle. C'est pourquoi chaque réponse renvoie à la pièce, à l'email ou au texte dont elle provient : vous contrôlez avant d'utiliser l'information, et vous la citez à la source.</p></details>
+      <details><summary>Mes données et mes dossiers sont-ils confidentiels ?</summary><p>Oui. Lexium est conçu autour de la confidentialité : protection des données, chiffrement et contrôle des accès, dans le respect du secret professionnel.</p></details>
+      <details><summary>Où sont hébergées les données ?</summary><p>En Europe.</p></details>
+      <details><summary>Lexium est-il adapté à tous les domaines du droit ?</summary><p>Lexium est une solution généraliste, destinée aux différentes spécialités juridiques : contrats, contentieux, famille, pénal, dommage corporel et autres.</p></details>
+      <details><summary>Quels types de documents puis-je analyser ?</summary><p>PDF, Word, Excel, PowerPoint, images et fichiers texte.</p></details>
+      <details><summary>Combien coûte Lexium ?</summary><p>Lexium Pro coûte 99 € HT par mois pour un utilisateur. Lexium Cabinet coûte 299 € HT par mois, jusqu'à 10 utilisateurs. Les grands cabinets disposent d'une offre sur devis.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONCLUSION ================= -->
+<section class="cta">
+  <div class="wrap">
+    <p class="pre">Par ces motifs,</p>
+    <div class="rule" aria-hidden="true"></div>
+    <h2>essayez Lexium sur vos propres dossiers.</h2>
+    <p class="cta-txt">Un dossier à créer, un document à importer, une question à poser. Cinq minutes suffisent pour juger.</p>
+    <a class="btn btn-primary" href="#demo" data-godemo>Explorer la démo</a>
+    <p class="reserve">Sous toutes réserves.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="logo"><span class="mark" aria-hidden="true"></span>LEXIUM</div>
+      <p>Votre assistant juridique intelligent. Un outil d'assistance : il ne se substitue pas au jugement de l'avocat.</p>
+    </div>
+    <div><h4>Produit</h4><a href="#fonctionnalites">Fonctionnalités</a><a href="#tarifs">Tarifs</a><a href="#demo">Démonstration</a><a href="#securite">Sécurité</a></div>
+    <div><h4>Ressources</h4><a href="#faq">Questions fréquentes</a><a href="#" data-soon="Centre d'aide">Centre d'aide</a><a href="#" data-soon="Contact">Contact</a></div>
+    <div><h4>Légal</h4><a href="#" data-soon="Mentions légales">Mentions légales</a><a href="#" data-soon="Politique de confidentialité">Politique de confidentialité</a><a href="#" data-soon="CGU">CGU</a><a href="#" data-soon="Cookies">Cookies</a></div>
+  </div>
+  <div class="wrap copy">© 2026 Lexium. Tous droits réservés.</div>
+</footer>
+
+<!-- ================= Connexion / inscription ================= -->
+<dialog id="auth" aria-labelledby="authTitle">
+  <div class="dlg">
+    <button class="sheet-handle" type="button" id="sheetHandle" aria-label="Faire glisser vers le bas pour fermer"></button>
+    <button class="x" type="button" data-close aria-label="Fermer">×</button>
+    <div class="logo" id="authTitle"><span class="mark" aria-hidden="true"></span>LEXIUM</div>
+    <div class="tabs" role="tablist" aria-label="Mode">
+      <button type="button" role="tab" id="loginTab" aria-selected="true" data-mode="login">Se connecter</button>
+      <button type="button" role="tab" id="signupTab" aria-selected="false" data-mode="signup">Créer un compte</button>
+    </div>
+    <form class="form" id="authForm" novalidate>
+      <div id="nameFields" hidden>
+        <label>Prénom<input name="prenom" autocomplete="off"></label>
+        <label>Nom<input name="nom" autocomplete="off"></label>
+        <label>Nom du cabinet<input name="cabinet" autocomplete="off"></label>
+      </div>
+      <label>Adresse email professionnelle<input type="email" name="email" autocomplete="off" required></label>
+      <label>Mot de passe<input type="password" name="pw" autocomplete="off" required></label>
+      <label id="confirmWrap" hidden>Confirmer le mot de passe<input type="password" name="pw2" autocomplete="off"></label>
+      <p class="err" id="authErr" role="alert" hidden></p>
+      <button class="btn btn-primary" type="submit" id="submitBtn">Se connecter</button>
+      <p class="form-note">Vos identifiants sont enregistrés pour créer votre compte. N'utilisez pas encore de vraies données de client tant que l'hébergement définitif n'a pas été validé.</p>
+    </form>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+document.documentElement.classList.add('js');
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Toast ---------- */
+var tt;
+function toast(msg){var t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show')},4200)}
+
+/* ---------- Menu mobile ---------- */
+var menuBtn=$('#menuBtn'),menu=$('#menu');
+menuBtn.addEventListener('click',function(){var o=menu.classList.toggle('open');menuBtn.setAttribute('aria-expanded',o)});
+menu.addEventListener('click',function(e){if(e.target.closest('a')){menu.classList.remove('open');menuBtn.setAttribute('aria-expanded','false')}});
+
+/* ---------- Animation du hero (une seule séquence) ---------- */
+(function(){
+  var marks=$$('.d-doc mark'),notes=$$('.d-notes .note');
+  function show(i){if(marks[i])marks[i].classList.add('on');if(notes[i])notes[i].classList.add('on')}
+  if(reduce){marks.forEach(function(_,i){show(i)});return}
+  marks.forEach(function(_,i){setTimeout(function(){show(i)},700+i*950)});
+})();
+
+/* ---------- Appels API ---------- */
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function api(path,opts){
+  opts=opts||{};
+  var headers=Object.assign({},opts.headers||{});
+  var body=opts.body;
+  if(body&&!(body instanceof FormData)){headers['Content-Type']='application/json';body=JSON.stringify(body)}
+  return fetch('/api'+path,{method:opts.method||'GET',credentials:'include',headers:headers,body:body})
+    .then(function(r){
+      return r.json().catch(function(){return {}}).then(function(data){
+        if(!r.ok){var err=new Error(data.error||'Erreur serveur');err.status=r.status;err.code=data.code;throw err}
+        return data;
+      });
+    });
+}
+
+/* ---------- Authentification ---------- */
+var dlg=$('#auth'),mode='login',currentUser=null,DOSSIERS_CACHE=[];
+function setMode(m){
+  mode=m;
+  $('#loginTab').setAttribute('aria-selected',m==='login');
+  $('#signupTab').setAttribute('aria-selected',m==='signup');
+  $('#nameFields').hidden=m!=='signup';
+  $('#confirmWrap').hidden=m!=='signup';
+  $('#submitBtn').textContent=m==='signup'?'Créer mon compte':'Se connecter';
+  $('#authErr').hidden=true;
+}
+function openAuth(m){setMode(m);if(dlg.showModal){dlg.showModal()}else{dlg.setAttribute('open','')}}
+function closeAuth(){if(dlg.close){dlg.close()}else{dlg.removeAttribute('open')}}
+function setLoggedInUI(){
+  $$('[data-auth]').forEach(function(b){b.textContent='Se déconnecter';b.dataset.auth='logout'});
+}
+function logout(){api('/auth/logout',{method:'POST'}).then(function(){location.reload()})}
+$$('[data-auth]').forEach(function(b){b.addEventListener('click',function(){
+  if(b.dataset.auth==='logout'){logout();return}
+  openAuth(b.dataset.auth);
+})});
+$$('[data-mode]').forEach(function(b){b.addEventListener('click',function(){setMode(b.dataset.mode)})});
+$('[data-close]').addEventListener('click',closeAuth);
+dlg.addEventListener('click',function(e){if(e.target===dlg)closeAuth()});
+$('#authForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  var f=e.target,err=$('#authErr');err.hidden=true;
+  var email=f.email.value.trim(),pw=f.pw.value;
+  if(!email||!pw){err.textContent='Renseignez une adresse email et un mot de passe.';err.hidden=false;return}
+  function done(data){currentUser=data.user;f.reset();closeAuth();setLoggedInUI();goDemo();chargerTout();toast('Bonjour '+data.user.nom+'.')}
+  function fail(e){err.textContent=e.message||'Une erreur est survenue.';err.hidden=false}
+  if(mode==='signup'){
+    if(!f.prenom.value.trim()||!f.nom.value.trim()){err.textContent='Merci d\u2019indiquer votre prénom et votre nom.';err.hidden=false;return}
+    if(pw!==f.pw2.value){err.textContent='Les deux mots de passe ne correspondent pas.';err.hidden=false;return}
+    if(pw.length<8){err.textContent='Le mot de passe doit contenir au moins 8 caractères.';err.hidden=false;return}
+    api('/auth/register',{method:'POST',body:{email:email,password:pw,nom:f.prenom.value.trim()+' '+f.nom.value.trim(),cabinet:f.cabinet.value.trim()||null}}).then(done).catch(fail);
+  }else{
+    api('/auth/login',{method:'POST',body:{email:email,password:pw}}).then(done).catch(fail);
+  }
+});
+
+/* ---------- Application (données réelles) ---------- */
+var MONTHS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+var DAYS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+function fr(iso){var p=String(iso).slice(0,10).split('-'),d=new Date(+p[0],+p[1]-1,+p[2]);return DAYS[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear()}
+function todayIso(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function initiales(nom){return (nom||'').trim().split(/\s+/).map(function(w){return w[0]}).slice(0,2).join('').toUpperCase()||'MD'}
+function setAvatars(){var i=initiales(currentUser&&currentUser.nom);$$('.avatar').forEach(function(el){el.textContent=i})}
+
+function chargerTout(){
+  setAvatars();
+  var g=$('#askGreeting');if(g&&currentUser)g.textContent='Bonjour '+currentUser.nom.split(' ')[0]+'. Posez une question sur vos dossiers.';
+  renderDash();renderDossiers();renderDocs();renderEch();renderCarpaRecap();
+}
+
+/* ---------- Mes dossiers ---------- */
+function statusBadge(s){return '<span class="dstatus '+(s==='Clôturé'?'dstatus-closed':'dstatus-active')+'">'+escapeHtml(s)+'</span>'}
+function renderDossiers(){
+  return api('/dossiers').then(function(data){
+    DOSSIERS_CACHE=data.dossiers;
+    $('#dossierCount').textContent=DOSSIERS_CACHE.length+' dossier'+(DOSSIERS_CACHE.length>1?'s':'');
+    $('#dossierEmpty').hidden=DOSSIERS_CACHE.length>0;
+    $('#dossierRows').innerHTML=DOSSIERS_CACHE.map(function(d){
+      return '<tr><td>'+escapeHtml(d.nom)+'</td><td>'+escapeHtml(d.nature||'—')+'</td><td>'+statusBadge(d.statut)+'</td><td><button class="btn-line" data-dossier="'+d.id+'">Ouvrir</button></td></tr>';
+    }).join('');
+    return DOSSIERS_CACHE;
+  });
+}
+$('#newDossierBtn').addEventListener('click',function(){$('#newDossierForm').hidden=!$('#newDossierForm').hidden});
+$('#newDossierForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  var nom=$('#newDossierNom').value.trim(),nature=$('#newDossierNature').value.trim();
+  if(!nom)return;
+  api('/dossiers',{method:'POST',body:{nom:nom,nature:nature||null}}).then(function(){
+    $('#newDossierForm').hidden=true;$('#newDossierNom').value='';$('#newDossierNature').value='';
+    renderDossiers();toast('Dossier créé.');
+  }).catch(function(e){toast(e.message)});
+});
+
+function dossierUploadForm(dossierId){
+  return '<form class="chat-form" id="uploadForm" style="margin-top:10px" data-dossier-id="'+dossierId+'">'+
+    '<input type="file" id="uploadFile" accept=".pdf,.txt" style="flex:1;min-width:0">'+
+    '<button class="btn btn-primary" type="submit">Ajouter</button></form>'+
+    '<p class="fine" style="margin-top:6px">PDF ou fichier texte. Ou collez le texte : </p>'+
+    '<form class="chat-form" id="uploadTextForm" data-dossier-id="'+dossierId+'">'+
+    '<input type="text" id="uploadNom" placeholder="Nom du document" style="max-width:220px" required>'+
+    '<input type="text" id="uploadTexte" placeholder="Collez le texte du document ici…" required>'+
+    '<button class="btn-line" type="submit">Ajouter</button></form>';
+}
+function bindUploadForms(){
+  var f1=$('#uploadForm');
+  if(f1)f1.addEventListener('submit',function(e){
+    e.preventDefault();
+    var file=$('#uploadFile').files[0],dossierId=f1.dataset.dossierId;
+    if(!file){toast('Choisissez un fichier.');return}
+    var fd=new FormData();fd.append('file',file);
+    api('/dossiers/'+dossierId+'/documents',{method:'POST',body:fd}).then(function(){
+      toast('Document ajouté.');openDossier(dossierId);renderDocs();renderDash();
+    }).catch(function(e){toast(e.message)});
+  });
+  var f2=$('#uploadTextForm');
+  if(f2)f2.addEventListener('submit',function(e){
+    e.preventDefault();
+    var dossierId=f2.dataset.dossierId,nom=$('#uploadNom').value.trim(),contenu=$('#uploadTexte').value.trim();
+    if(!nom||!contenu)return;
+    api('/dossiers/'+dossierId+'/documents',{method:'POST',body:{nom:nom,contenu:contenu}}).then(function(){
+      toast('Document ajouté.');openDossier(dossierId);renderDocs();renderDash();
+    }).catch(function(e){toast(e.message)});
+  });
+}
+function dossierEcheanceForm(dossierId){
+  return '<form class="chat-form" id="dossierEchForm" style="margin-top:10px" data-dossier-id="'+dossierId+'">'+
+    '<input type="text" id="dechTitre" placeholder="Intitulé de l\u2019échéance" required>'+
+    '<input type="date" id="dechDate" required style="max-width:170px">'+
+    '<button class="btn-line" type="submit">Ajouter</button></form>';
+}
+function bindDossierEcheanceForm(){
+  var f=$('#dossierEchForm');if(!f)return;
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var dossierId=f.dataset.dossierId,titre=$('#dechTitre').value.trim(),date=$('#dechDate').value;
+    if(!titre||!date)return;
+    api('/echeances',{method:'POST',body:{dossier_id:dossierId,titre:titre,date_echeance:date,source:'Ajoutée manuellement'}}).then(function(){
+      toast('Échéance ajoutée.');openDossier(dossierId);renderEch();renderDash();
+    }).catch(function(e){toast(e.message)});
+  });
+}
+function renderDossierDetail(id){
+  return Promise.all([api('/dossiers/'+id), api('/carpa?dossier_id='+id)]).then(function(r){
+    var data=r[0],carpa=r[1];
+    var d=data.dossier,docs=data.documents,ech=data.echeances;
+    var html='<div class="view-head"><div><h3>'+escapeHtml(d.nom)+'</h3><p class="muted">'+escapeHtml(d.nature||'')+' · '+statusBadge(d.statut)+'</p></div></div>';
+    html+='<div class="two">';
+    html+='<div><h4 class="h4">Documents ('+docs.length+')</h4>'+
+      (docs.length?'<ul class="rows">'+docs.map(function(doc){return '<li>'+escapeHtml(doc.nom)+'<small>'+escapeHtml(doc.type||'')+' · '+(doc.statut==='analyse'?'analysé':'à analyser')+'</small></li>'}).join(''):'<p class="muted" style="font-size:13.5px">Aucun document pour l\u2019instant.</p>')+
+      dossierUploadForm(d.id)+'</div>';
+    html+='<div><h4 class="h4">Échéances ('+ech.length+')</h4>'+
+      (ech.length?'<ul class="rows">'+ech.map(function(e){return '<li>'+escapeHtml(e.titre)+'<small>'+fr(e.date_echeance)+'</small></li>'}).join(''):'<p class="muted" style="font-size:13.5px">Aucune échéance pour l\u2019instant.</p>')+
+      dossierEcheanceForm(d.id)+'</div>';
+    html+='</div>';
+    html+=renderCarpaSection(d.id,carpa);
+    html+='<button class="btn btn-primary" data-view="ask" data-scope-dossier="'+d.id+'" style="margin-top:26px">Poser une question sur ce dossier</button>'+
+      ' <button class="btn-line" data-delete-dossier="'+d.id+'" style="margin-top:26px">Supprimer ce dossier</button>';
+    $('#dossierDetailBody').innerHTML=html;
+    bindUploadForms();bindDossierEcheanceForm();bindCarpaForm();
+  }).catch(function(e){toast(e.message)});
+}
+function openDossier(id){$('#dossierList').hidden=true;$('#dossierDetail').hidden=false;renderDossierDetail(id)}
+
+/* ---------- Suivi CARPA (aide-mémoire, aucun mouvement bancaire réel) ---------- */
+var CARPA_LABELS={reception:'Réception pour le client',honoraires:'Prélèvement d\u2019honoraires',reversement:'Reversement au client',autre:'Autre mouvement'};
+function fmtEUR(n){return Number(n).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'}
+function renderCarpaSection(dossierId,carpa){
+  var mvts=carpa.mouvements,solde=carpa.solde;
+  var html='<div class="also" style="margin-top:36px;padding-top:24px">';
+  html+='<h4 class="h4">Suivi CARPA — aide-mémoire</h4>';
+  html+='<p class="fine" style="margin:-2px 0 14px">Ceci ne remplace pas votre compte CARPA réel : c\u2019est un aide-mémoire pour suivre, dossier par dossier, ce qui reste à reverser. À valider avec votre Ordre avant tout usage sur un vrai dossier. Aucun fonds n\u2019est déplacé par Lexium.</p>';
+  html+='<p style="font-weight:650;margin-bottom:12px">Reste dû au client : <span style="color:'+(Math.abs(solde)>0.004?'var(--seal)':'var(--steel)')+'">'+fmtEUR(solde)+'</span></p>';
+  html+=mvts.length?'<ul class="rows">'+mvts.map(function(m){
+    return '<li>'+CARPA_LABELS[m.type]+' — '+fmtEUR(m.montant)+'<small>'+fr(m.date_mouvement)+(m.provenance_destinataire?' · '+escapeHtml(m.provenance_destinataire):'')+(m.reference?' · réf. '+escapeHtml(m.reference):'')+'</small></li>';
+  }).join('')+'</ul>':'<p class="muted" style="font-size:13.5px">Aucun mouvement enregistré.</p>';
+  html+='<form class="chat-form" id="carpaForm" style="margin-top:14px;flex-wrap:wrap" data-dossier-id="'+dossierId+'">'+
+    '<select id="carpaType" required style="min-height:46px;border:1px solid var(--ink);border-radius:6px;padding:0 10px;background:var(--white)">'+
+      '<option value="reception">Réception pour le client</option>'+
+      '<option value="honoraires">Prélèvement d\u2019honoraires</option>'+
+      '<option value="reversement">Reversement au client</option>'+
+      '<option value="autre">Autre</option>'+
+    '</select>'+
+    '<input type="number" id="carpaMontant" placeholder="Montant €" min="0.01" step="0.01" required style="max-width:140px">'+
+    '<input type="date" id="carpaDate" required style="max-width:170px">'+
+    '<input type="text" id="carpaProvenance" placeholder="Provenance / destinataire" style="max-width:220px">'+
+    '<input type="text" id="carpaReference" placeholder="Référence (optionnel)" style="max-width:180px">'+
+    '<button class="btn-line" type="submit">Ajouter</button></form>';
+  html+='</div>';
+  return html;
+}
+function bindCarpaForm(){
+  var f=$('#carpaForm');if(!f)return;
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var dossierId=f.dataset.dossierId;
+    var body={dossier_id:dossierId,type:$('#carpaType').value,montant:$('#carpaMontant').value,date_mouvement:$('#carpaDate').value,provenance_destinataire:$('#carpaProvenance').value.trim()||null,reference:$('#carpaReference').value.trim()||null};
+    if(!body.montant||!body.date_mouvement){toast('Montant et date sont requis.');return}
+    api('/carpa',{method:'POST',body:body}).then(function(){toast('Mouvement enregistré.');openDossier(dossierId);renderCarpaRecap()}).catch(function(err){toast(err.message)});
+  });
+}
+
+
+/* ---------- Documents ---------- */
+function renderDocs(){
+  return api('/documents').then(function(data){
+    var docs=data.documents;
+    $('#docCount').textContent=docs.length+' document'+(docs.length>1?'s':'')+(docs.length?' — '+docs.filter(function(d){return d.statut!=='analyse'}).length+' à analyser':'');
+    $('#docEmpty').hidden=docs.length>0;
+    $('#docRows').innerHTML=docs.map(function(d){
+      return '<tr><td>'+escapeHtml(d.nom)+'</td><td>'+escapeHtml(d.dossier_nom||'—')+'</td><td>'+escapeHtml(d.type||'')+'</td>'+
+        '<td><span class="st">'+(d.statut==='analyse'?'Analysé':'À analyser')+'</span></td>'+
+        '<td><button class="btn-line" data-analyse="'+d.id+'">'+(d.statut==='analyse'?'Voir':'Analyser')+'</button></td></tr>';
+    }).join('');
+  });
+}
+var LVL_LAB={eleve:'Risque élevé',a_surveiller:'À surveiller',a_negocier:'À négocier'};
+function renderAnalysisResult(doc){
+  var a=doc.analyse_ia;
+  if(!a){$('#anBody').innerHTML='<p class="muted">Aucune analyse disponible.</p>';return}
+  var html='<div class="an-tools"><div><h3>'+escapeHtml(doc.nom)+'</h3>'+
+    (a.parties&&a.parties.length?'<p class="muted" style="font-size:13.5px;margin-top:2px">'+escapeHtml(a.parties.join(' — '))+'</p>':'')+'</div></div>';
+  if(a.resume)html+='<p style="margin-bottom:18px">'+escapeHtml(a.resume)+'</p>';
+  html+='<div class="an-grid"><div class="contract" tabindex="0">'+escapeHtml(doc.contenu||'').replace(/\n/g,'<br>')+'</div><div>';
+  (a.clauses_a_risque||[]).forEach(function(f){
+    html+='<article class="finding"><header><span class="lvl lvl-'+(f.niveau==='eleve'?'high':f.niveau==='a_surveiller'?'watch':'neg')+'">'+(LVL_LAB[f.niveau]||f.niveau)+'</span><h5>'+escapeHtml(f.titre||'')+'</h5></header>'+
+      '<p>'+escapeHtml(f.explication||'')+'</p>'+
+      (f.fondement_juridique?'<p><b>Fondement.</b> '+escapeHtml(f.fondement_juridique)+'</p>':'')+
+      (f.recommandation?'<p><b>À faire.</b> '+escapeHtml(f.recommandation)+'</p>':'')+
+      '</article>';
+  });
+  if(a.dates_cles&&a.dates_cles.length){
+    html+='<div class="also" style="margin-top:20px;padding-top:16px"><h4 class="h4">Dates identifiées</h4><ul class="rows">'+
+      a.dates_cles.map(function(dc,i){
+        return '<li>'+escapeHtml(dc.evenement)+'<small>'+(/^\d{4}-\d{2}-\d{2}$/.test(dc.date)?fr(dc.date):escapeHtml(dc.date))+'</small>'+
+          (/^\d{4}-\d{2}-\d{2}$/.test(dc.date)?' <button class="btn-line" data-add-ech-doc="'+doc.id+'" data-add-ech-dossier="'+doc.dossier_id+'" data-add-ech-titre="'+escapeHtml(dc.evenement)+'" data-add-ech-date="'+dc.date+'">+ Agenda</button>':'')+
+          '</li>';
+      }).join('')+'</ul></div>';
+  }
+  html+='</div></div><p class="conf">Vérifiez chaque point dans le document et à la source avant de l\u2019utiliser.</p>';
+  $('#anBody').innerHTML=html;
+}
+function openDocAnalysis(id){
+  $('#docList').hidden=true;$('#docAn').hidden=false;$('#anBody').hidden=true;$('#anLoad').hidden=false;
+  api('/documents/'+id).then(function(data){
+    if(data.document.analyse_ia){$('#anLoad').hidden=true;$('#anBody').hidden=false;renderAnalysisResult(data.document);return}
+    return api('/documents/'+id+'/analyze',{method:'POST'}).then(function(r){
+      $('#anLoad').hidden=true;$('#anBody').hidden=false;renderAnalysisResult(r.document);
+    });
+  }).catch(function(e){
+    $('#anLoad').hidden=true;$('#anBody').hidden=false;
+    if(e.code==='NO_API_KEY'){$('#anBody').innerHTML='<p class="muted">L\u2019analyse par IA n\u2019est pas encore configurée sur ce serveur : il manque la clé Anthropic. Une fois ajoutée, revenez ici.</p>'}
+    else{$('#anBody').innerHTML='<p class="muted">'+escapeHtml(e.message)+'</p>'}
+  });
+}
+
+/* ---------- Échéances ---------- */
+function renderEch(){
+  return api('/echeances').then(function(data){
+    var list=data.echeances;
+    var days={};list.forEach(function(e){var k=String(e.date_echeance).slice(0,10);(days[k]=days[k]||[]).push(e)});
+    var opts=DOSSIERS_CACHE.map(function(d){return '<option value="'+d.id+'">'+escapeHtml(d.nom)+'</option>'}).join('');
+    var html='<div class="view-head"><div><h3>Échéances</h3><p class="muted">'+list.length+' échéance'+(list.length>1?'s':'')+'</p></div></div>';
+    html+='<form class="chat-form" id="newEchForm" style="margin-bottom:22px">'+
+      '<select id="newEchDossier" required style="min-height:46px;border:1px solid var(--ink);border-radius:6px;padding:0 10px;background:var(--white)"><option value="">Dossier…</option>'+opts+'</select>'+
+      '<input type="text" id="newEchTitre" placeholder="Intitulé" required>'+
+      '<input type="date" id="newEchDate" required style="max-width:170px">'+
+      '<button class="btn btn-primary" type="submit">Ajouter</button></form>';
+    if(!list.length)html+='<p class="ech-empty">Aucune échéance pour l\u2019instant.</p>';
+    Object.keys(days).sort().forEach(function(d){
+      html+='<div class="ech-day"><h4 class="h4">'+fr(d)+'</h4><ul class="rows">'+days[d].map(function(e){
+        return '<li>'+escapeHtml(e.titre)+'<small>'+escapeHtml(e.dossier_nom)+'</small>'+(e.source?'<span class="src">'+escapeHtml(e.source)+'</span>':'')+'</li>';
+      }).join('')+'</ul></div>';
+    });
+    $('#view-ech').innerHTML=html;
+    $('#newEchForm').addEventListener('submit',function(e){
+      e.preventDefault();
+      var dossier_id=$('#newEchDossier').value,titre=$('#newEchTitre').value.trim(),date=$('#newEchDate').value;
+      if(!dossier_id||!titre||!date){toast('Choisissez un dossier, un intitulé et une date.');return}
+      api('/echeances',{method:'POST',body:{dossier_id:dossier_id,titre:titre,date_echeance:date}}).then(function(){toast('Échéance ajoutée.');renderEch();renderDash()}).catch(function(err){toast(err.message)});
+    });
+  });
+}
+
+/* ---------- CARPA : récapitulatif global ---------- */
+function renderCarpaRecap(){
+  return fetch('/api/carpa/recap',{credentials:'include'}).then(function(r){return r.json()}).then(function(data){
+    var rows=data.dossiers;
+    var html='<div class="view-head"><div><h3>CARPA</h3><p class="muted">Récapitulatif par dossier — reste dû aux clients</p></div></div>';
+    html+='<p class="fine" style="margin:-8px 0 20px">Aide-mémoire, pas un relevé bancaire : à recouper avec votre compte CARPA réel. Aucun fonds n\u2019est déplacé par Lexium.</p>';
+    if(!rows.length){html+='<p class="muted">Aucun mouvement CARPA enregistré pour l\u2019instant. Ouvrez un dossier concerné (indemnisation, séquestre…) pour en ajouter un.</p>';$('#view-carpa').innerHTML=html;return}
+    html+='<p style="font-weight:650;margin-bottom:16px">Total encore dû, tous dossiers confondus : <span style="color:'+(Math.abs(data.total)>0.004?'var(--seal)':'var(--steel)')+'">'+fmtEUR(data.total)+'</span></p>';
+    html+='<table class="docs"><thead><tr><th scope="col">Dossier</th><th scope="col">Reste dû</th><th scope="col">Dernier mouvement</th><th scope="col"><span class="sr-only">Action</span></th></tr></thead><tbody>'+
+      rows.map(function(r){
+        var solde=Math.abs(r.solde)>0.004;
+        return '<tr><td>'+escapeHtml(r.dossier_nom)+'</td>'+
+          '<td><span class="dstatus '+(solde?'dstatus-active':'dstatus-closed')+'" style="'+(solde?'color:var(--seal);background:var(--seal-bg)':'')+'">'+fmtEUR(r.solde)+'</span></td>'+
+          '<td>'+(r.dernier_mouvement?fr(r.dernier_mouvement):'—')+'</td>'+
+          '<td><button class="btn-line" data-dossier="'+r.dossier_id+'">Ouvrir</button></td></tr>';
+      }).join('')+'</tbody></table>';
+    $('#view-carpa').innerHTML=html;
+  });
+}
+
+/* ---------- Tableau de bord ---------- */
+function renderDash(){
+  return Promise.all([api('/dossiers'),api('/echeances'),api('/documents')]).then(function(r){
+    var dossiers=r[0].dossiers,echeances=r[1].echeances,documents=r[2].documents;
+    DOSSIERS_CACHE=dossiers;
+    var today=todayIso();
+    var todays=echeances.filter(function(e){return String(e.date_echeance).slice(0,10)===today});
+    var aAnalyser=documents.filter(function(d){return d.statut!=='analyse'});
+    var actifs=dossiers.filter(function(d){return d.statut==='En cours'});
+    if(!dossiers.length){
+      $('#view-dash').innerHTML='<div class="view-head"><div><h3>Bienvenue'+(currentUser?', '+escapeHtml(currentUser.nom):'')+'</h3><p class="muted">Créez votre premier dossier pour commencer.</p></div><span class="avatar" aria-hidden="true"></span></div>'+
+        '<button class="btn btn-primary" data-view="dossiers">Créer un dossier</button>';
+      setAvatars();return;
+    }
+    var html='<div class="view-head"><div><h3>Bonjour'+(currentUser?', '+escapeHtml(currentUser.nom.split(' ')[0]):'')+'</h3><p class="muted">'+fr(today)+'</p></div><span class="avatar" aria-hidden="true"></span></div>'+
+    '<div class="stats">'+
+      '<button class="stat" data-view="ech"><span class="stat-n">'+todays.length+'</span>échéance'+(todays.length>1?'s':'')+' aujourd\u2019hui</button>'+
+      '<button class="stat" data-view="docs"><span class="stat-n">'+aAnalyser.length+'</span>document'+(aAnalyser.length>1?'s':'')+' à analyser</button>'+
+      '<button class="stat" data-view="dossiers"><span class="stat-n">'+actifs.length+'</span>dossier'+(actifs.length>1?'s':'')+' actif'+(actifs.length>1?'s':'')+'</button>'+
+    '</div><div class="two">'+
+      '<div><h4 class="h4">Aujourd\u2019hui</h4>'+(todays.length?'<ul class="rows">'+todays.map(function(e){return '<li>'+escapeHtml(e.titre)+'<small>'+escapeHtml(e.dossier_nom)+'</small></li>'}).join(''):'<p class="muted" style="font-size:13.5px">Rien de prévu aujourd\u2019hui.</p>')+'</div>'+
+      '<div><h4 class="h4">Documents à analyser</h4>'+(aAnalyser.length?'<ul class="rows">'+aAnalyser.slice(0,5).map(function(d){return '<li>'+escapeHtml(d.nom)+'<small>'+escapeHtml(d.dossier_nom||'')+'</small></li>'}).join(''):'<p class="muted" style="font-size:13.5px">Tout est analysé.</p>')+'</div>'+
+    '</div>'+
+    '<div class="ask"><p><b>Que souhaitez-vous faire ?</b> Importez un document, ou posez une question à l\u2019assistant.</p>'+
+      '<div class="chips"><button class="chip" data-view="dossiers">Ouvrir un dossier</button><button class="chip" data-view="ask">Poser une question</button><button class="chip" data-view="recherche">Recherche juridique</button></div></div>';
+    $('#view-dash').innerHTML=html;setAvatars();
+  });
+}
+
+/* ---------- Recherche juridique ---------- */
+function jurisCard(it){
+  var tag=it.type==='texte'?'Texte de loi':(it.type==='juris'?'Jurisprudence':'Dans vos dossiers');
+  var link=it.href?'<a class="src-ext" href="'+it.href+'" target="_blank" rel="noopener">Consulter sur Légifrance ↗</a>':'';
+  return '<article class="jcard"><span class="jtag jtag-'+it.type+'">'+tag+'</span><h5>'+escapeHtml(it.titre)+'</h5>'+
+    (it.meta?'<p class="jmeta">'+escapeHtml(it.meta)+'</p>':'')+'<p>'+escapeHtml(it.extrait)+'</p>'+link+'</article>';
+}
+function renderJuris(items,label){
+  if(!items||!items.length){$('#jurisResults').innerHTML='<p class="muted" style="margin-top:18px">Cette version répond à trois recherches préparées : pénalité manifestement excessive, reconduction tacite, clause déséquilibrée. Une recherche en direct dans l\u2019ensemble des textes et de la jurisprudence sera branchée ensuite.</p>';return}
+  var html='<div class="jhead"><span class="badge badge-real">Contenu réel, vérifié</span> <span class="muted" style="font-size:13.5px">'+items.length+' résultat(s)'+(label?' pour « '+escapeHtml(label)+' »':'')+'</span></div>';
+  html+=items.map(jurisCard).join('');
+  html+='<p class="muted" style="font-size:12.5px;margin-top:6px">Toujours vérifier la version en vigueur avant de citer une pièce.</p>';
+  $('#jurisResults').innerHTML=html;
+}
+function rechercherJuris(q){
+  fetch('/api/recherche?q='+encodeURIComponent(q),{credentials:'include'}).then(function(r){return r.json()}).then(function(data){
+    renderJuris(data.items,data.label);
+  });
+}
+
+/* ---------- Assistant ---------- */
+var busy=false;
+function send(text){
+  text=(text||'').trim();if(busy||!text)return;busy=true;
+  var log=$('#chatLog');
+  var u=document.createElement('div');u.className='msg user';u.textContent=text;log.appendChild(u);
+  var a=document.createElement('div');a.className='msg bot';a.innerHTML='<span class="typing" role="status"><span class="sr-only">Lexium prépare une réponse</span><span class="tdot" aria-hidden="true"></span><span class="tdot" aria-hidden="true"></span><span class="tdot" aria-hidden="true"></span></span>';log.appendChild(a);
+  log.scrollTop=log.scrollHeight;
+  api('/chat',{method:'POST',body:{message:text,dossier_id:chatDossierScope||undefined}}).then(function(r){
+    a.innerHTML='<p class="who">Lexium</p><p>'+escapeHtml(r.reponse).replace(/\n/g,'<br>')+'</p>';
+    busy=false;log.scrollTop=log.scrollHeight;
+  }).catch(function(e){
+    a.innerHTML='<p class="who">Lexium</p><p>'+(e.code==='NO_API_KEY'?'L\u2019assistant n\u2019est pas encore configuré sur ce serveur (clé Anthropic manquante).':escapeHtml(e.message))+'</p>';
+    busy=false;log.scrollTop=log.scrollHeight;
+  });
+}
+/* Navigation entre sections */
+var VIEWS=['dash','dossiers','docs','recherche','ask','ech','carpa'];
+var currentView='dash';
+var chatDossierScope=null;
+function setView(v,focus){
+  currentView=v;
+  VIEWS.forEach(function(n){$('#view-'+n).hidden=n!==v});
+  $$('.nav-item[data-view]').forEach(function(b){if(b.dataset.view===v){b.setAttribute('aria-current','page')}else{b.removeAttribute('aria-current')}});
+  $$('.app-dots .dot').forEach(function(d){d.classList.toggle('on',d.dataset.dot===v)});
+  if(v==='docs'){$('#docList').hidden=false;$('#docAn').hidden=true}
+  if(v==='dossiers'){$('#dossierList').hidden=false;$('#dossierDetail').hidden=true}
+  if(focus)$('#appMain').focus({preventScroll:true});
+}
+function goDemo(){
+  setView('dash');
+  var d=$('#demo');d.scrollIntoView({behavior:reduce?'auto':'smooth'});
+}
+
+/* Délégation des clics */
+document.addEventListener('click',function(e){
+  var t;
+  if((t=e.target.closest('[data-godemo]'))){
+    e.preventDefault();
+    if(currentUser){goDemo()}else{openAuth('login')}
+    return}
+  if((t=e.target.closest('[data-soon]'))){e.preventDefault();var n=t.dataset.soon;toast(t.closest('footer')?'Cette page n\u2019existe pas encore.':'« '+n+' » n\u2019est pas encore disponible.');return}
+  if((t=e.target.closest('[data-view]'))){
+    chatDossierScope=t.dataset.scopeDossier||null;
+    setView(t.dataset.view,true);
+    return}
+  if((t=e.target.closest('[data-analyse]'))){openDocAnalysis(t.dataset.analyse);return}
+  if(e.target.closest('#backDocs')){$('#docList').hidden=false;$('#docAn').hidden=true;return}
+  if((t=e.target.closest('[data-dossier]'))){setView('dossiers');openDossier(t.dataset.dossier);return}
+  if(e.target.closest('#backDossiers')){$('#dossierList').hidden=false;$('#dossierDetail').hidden=true;return}
+  if((t=e.target.closest('[data-juris]'))){
+    var jk=t.dataset.juris,label=t.textContent;
+    $('#jurisInput').value=label;rechercherJuris(label);
+    return}
+  if((t=e.target.closest('[data-delete-dossier]'))){
+    var did=t.dataset.deleteDossier;
+    if(!confirm('Supprimer définitivement ce dossier et tous ses documents et échéances ?'))return;
+    api('/dossiers/'+did,{method:'DELETE'}).then(function(){
+      toast('Dossier supprimé.');$('#dossierList').hidden=false;$('#dossierDetail').hidden=true;
+      renderDossiers();renderDocs();renderEch();renderDash();
+    }).catch(function(err){toast(err.message)});
+    return}
+  if((t=e.target.closest('[data-add-ech-date]'))){
+    api('/echeances',{method:'POST',body:{dossier_id:t.dataset.addEchDossier,titre:t.dataset.addEchTitre,date_echeance:t.dataset.addEchDate,source:'Détectée par l\u2019analyse'}})
+      .then(function(){toast('Ajoutée aux échéances.');renderEch();renderDash()}).catch(function(err){toast(err.message)});
+    return}
+});
+$('#chatForm').addEventListener('submit',function(e){e.preventDefault();var i=$('#chatInput');var v=i.value;i.value='';send(v)});
+$('#jurisForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  var v=$('#jurisInput').value.trim();if(v)rechercherJuris(v);
+});
+
+
+/* Balayage tactile entre les sections de la démo */
+(function(){
+  var main=$('#appMain'),sx=0,sy=0,dx=0,dy=0,tracking=false;
+  main.addEventListener('touchstart',function(e){
+    if(e.touches.length!==1)return;
+    sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;dy=0;tracking=true;
+  },{passive:true});
+  main.addEventListener('touchmove',function(e){
+    if(!tracking||e.touches.length!==1)return;
+    dx=e.touches[0].clientX-sx;dy=e.touches[0].clientY-sy;
+  },{passive:true});
+  main.addEventListener('touchend',function(){
+    if(!tracking)return;tracking=false;
+    if(Math.abs(dx)<58||Math.abs(dx)<Math.abs(dy)*1.5)return;
+    var i=VIEWS.indexOf(currentView);
+    var ni=dx<0?Math.min(VIEWS.length-1,i+1):Math.max(0,i-1);
+    if(ni!==i)setView(VIEWS[ni]);
+  });
+})();
+
+/* Pièce du hero : inclinaison au pointeur, comme du papier soulevé */
+(function(){
+  var card=$('.dossier');if(!card||reduce)return;
+  var raf=null;
+  card.addEventListener('pointermove',function(e){
+    if(e.pointerType==='touch')return;
+    if(raf)cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(function(){
+      var r=card.getBoundingClientRect();
+      var px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;
+      card.style.transform='perspective(1200px) rotateX('+(py*-6).toFixed(2)+'deg) rotateY('+(px*8).toFixed(2)+'deg)';
+    });
+  });
+  card.addEventListener('pointerleave',function(){card.style.transform=''});
+})();
+
+/* Toast : glisser pour écarter */
+(function(){
+  var el=$('#toast'),sx=0,dx=0,dragging=false;
+  el.addEventListener('touchstart',function(e){dragging=true;sx=e.touches[0].clientX;dx=0;el.style.transition='none'},{passive:true});
+  el.addEventListener('touchmove',function(e){
+    if(!dragging)return;dx=e.touches[0].clientX-sx;
+    el.style.transform='translate(calc(-50% + '+dx+'px),0)';el.style.opacity=String(Math.max(.15,1-Math.abs(dx)/160));
+  },{passive:true});
+  el.addEventListener('touchend',function(){
+    if(!dragging)return;dragging=false;el.style.transition='';
+    if(Math.abs(dx)>90){el.classList.remove('show');clearTimeout(tt)}
+    el.style.transform='';el.style.opacity='';
+  });
+})();
+
+/* Connexion : feuille tactile sur mobile, glisser vers le bas pour fermer */
+(function(){
+  var handle=$('#sheetHandle');if(!handle)return;
+  var sy=0,cy=0,dragging=false;
+  function sheetActive(){return window.matchMedia('(max-width:560px)').matches}
+  handle.addEventListener('click',function(){if(sheetActive())closeAuth()});
+  handle.addEventListener('touchstart',function(e){
+    if(!sheetActive())return;
+    dragging=true;sy=e.touches[0].clientY;cy=sy;dlg.style.transition='none';
+  },{passive:true});
+  handle.addEventListener('touchmove',function(e){
+    if(!dragging)return;cy=e.touches[0].clientY;
+    var d=Math.max(0,cy-sy);dlg.style.transform='translateY('+d+'px)';
+  },{passive:true});
+  handle.addEventListener('touchend',function(){
+    if(!dragging)return;dragging=false;dlg.style.transition='';
+    var d=Math.max(0,cy-sy);
+    if(d>90){closeAuth()}
+    dlg.style.transform='';
+  });
+})();
+
+/* Tarifs : sélecteur mensuel / annuel */
+(function(){
+  var toggle=$('.freq-toggle');if(!toggle)return;
+  var PRICES={pro:{m:'99',a:'84'},cab:{m:'299',a:'254'}};
+  function setFreq(f){
+    $$('.freq-toggle button').forEach(function(b){b.setAttribute('aria-checked',String(b.dataset.freq===f))});
+    $('.freq-thumb').style.transform=f==='a'?'translateX(100%)':'translateX(0)';
+    $('#proAmount').innerHTML=PRICES.pro[f]+' €<small> HT / mois</small>';
+    $('#cabAmount').innerHTML=PRICES.cab[f]+' €<small> HT / mois</small>';
+    $('#proNote').hidden=f!=='a';$('#cabNote').hidden=f!=='a';
+  }
+  toggle.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-freq]');if(!b)return;setFreq(b.dataset.freq);
+  });
+})();
+
+api('/auth/me').then(function(data){
+  currentUser=data.user;setLoggedInUI();chargerTout();
+}).catch(function(){ /* pas connecté : la page vitrine reste affichée telle quelle */ });
+})();
+</script>
+</body>
+</html>

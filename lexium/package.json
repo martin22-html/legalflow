@@ -1,0 +1,27 @@
+{
+  "name": "lexium-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Backend fonctionnel pour la démo Lexium — analyse de documents, assistant, dossiers, échéances, recherche juridique.",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.3.0",
+    "cookie-session": "^2.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "multer": "^2.0.1",
+    "pdf-parse": "^1.1.1",
+    "pg": "^8.13.0"
+  }
+}
