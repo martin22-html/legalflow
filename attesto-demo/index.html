@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attesto — Assistant juridique pour cabinets d'avocats</title>
+<meta name="description" content="Attesto analyse vos documents, retrouve l'information dans vos dossiers et cite ses sources. Un assistant pour les avocats, qui laisse la décision au professionnel.">
+<meta name="theme-color" content="#14213a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Attesto — Un assistant juridique qui cite ses sources">
+<meta property="og:description" content="Analyse de documents, recherche dans les dossiers, gestion du cabinet. Essayez la démo sur un cabinet fictif.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='8' y='8' width='16' height='16' transform='rotate(45 16 16)' fill='none' stroke='%2314213a' stroke-width='2.5'/%3E%3Crect x='12.5' y='12.5' width='7' height='7' transform='rotate(45 16 16)' fill='%2314213a'/%3E%3C/svg%3E">
+<style>
+:root{
+  --ink:#14213a;--ink-2:#33425c;--muted:#5a6678;
+  --paper:#f4f5f2;--white:#fff;--line:#d9ddd6;--line-2:#e7e9e4;
+  --seal:#8a2c38;--seal-bg:#f7eaeb;--seal-soft:#e6b3ba;
+  --hl:#f3df8e;--hl-bg:#fbf3d0;--amber:#7a5200;--steel:#3d5a80;--steel-bg:#e8eef5;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --wrap:1160px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--sans);font-size:16px;line-height:1.6;color:var(--ink);background:var(--white)}
+h1,h2,h3,h4,h5,p,ul,ol,dl,dd,figure,blockquote{margin:0}
+ul,ol{padding:0;list-style:none}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--seal);outline-offset:2px}
+.wrap{width:min(var(--wrap),calc(100% - 48px));margin-inline:auto}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:12px;top:-64px;background:var(--ink);color:#fff;padding:10px 14px;border-radius:4px;z-index:100}
+.skip:focus{top:12px}
+.muted{color:var(--muted)}
+section[id]{scroll-margin-top:76px}
+
+/* ---------- Tactile : pression, cibles, défilement ---------- */
+button,a{-webkit-tap-highlight-color:transparent}
+.btn,.btn-line,.chip,.stat,.nav-item,.src,.tabs button,.menu-btn,.x,.faq summary,.freq-toggle button{touch-action:manipulation}
+.btn,.btn-line,.chip,.stat,.nav-item,.src,.tabs button,.menu-btn,.x{transition:transform .12s cubic-bezier(.2,.8,.2,1),background-color .15s,border-color .15s,color .15s,box-shadow .15s,opacity .15s}
+.btn:active,.btn-line:active,.chip:active,.stat:active,.nav-item:active,.src:active,.tabs button:active,.menu-btn:active,.x:active{transform:scale(.96)}
+.faq summary{transition:opacity .12s}
+.faq summary:active{opacity:.55}
+.pulse{animation:pulse .42s cubic-bezier(.2,.8,.2,1)}
+@keyframes pulse{0%{transform:scale(1)}42%{transform:scale(1.06)}100%{transform:scale(1)}}
+
+/* ---------- Boutons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 22px;border-radius:6px;border:1px solid var(--ink);font-size:15px;font-weight:600;background:var(--white);color:var(--ink);transition:background-color .15s,color .15s,border-color .15s}
+.btn:hover{background:var(--paper)}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{background:#0d1729}
+.btn-sm{min-height:40px;padding:0 16px;font-size:14px}
+.btn-line{min-height:36px;padding:0 12px;border-radius:4px;border:1px solid var(--line);background:var(--white);font-size:13px;font-weight:600}
+.btn-line:hover{background:var(--paper);border-color:var(--ink-2)}
+.btn-line[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* ---------- Navigation ---------- */
+.nav{position:sticky;top:0;z-index:30;height:68px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line-2)}
+.nav-in{height:100%;display:flex;align-items:center;gap:28px}
+.logo{display:inline-flex;align-items:center;gap:13px;font-size:17px;font-weight:650;letter-spacing:.2em}
+.mark{width:22px;height:22px;border:2px solid currentColor;transform:rotate(45deg);position:relative;flex:none;margin-right:2px}
+.mark::after{content:"";position:absolute;inset:4px;background:currentColor}
+.links{display:flex;gap:26px;margin-left:auto;font-size:14px;color:var(--ink-2)}
+.links a{padding:6px 0;border-bottom:1px solid transparent}
+.links a:hover{border-bottom-color:var(--ink)}
+.menu-btn{display:none;margin-left:auto;min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:6px;background:var(--white);font-size:14px}
+
+/* ---------- Titres de section (numérotation d'acte) ---------- */
+.sec{padding:104px 0}
+.sec-paper{background:var(--paper)}
+.sec-dark{background:var(--ink);color:#fff}
+.sec-dark :focus-visible{outline-color:#fff}
+.sec-head{display:grid;grid-template-columns:72px minmax(0,1fr);gap:8px;margin-bottom:52px}
+.rn{font-family:var(--serif);font-size:30px;line-height:1.2;color:var(--seal);font-weight:500}
+.sec-dark .rn{color:var(--seal-soft)}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(30px,3.6vw,46px);line-height:1.12;letter-spacing:-.018em;max-width:20ch}
+.wide-h2{max-width:26ch}
+.lead{font-family:var(--serif);font-size:19px;line-height:1.65;color:var(--ink-2);max-width:62ch;margin-top:18px}
+.sec-dark .lead{color:#c9d3e0}
+
+/* ---------- Hero ---------- */
+.hero{background:var(--paper);padding:84px 0 92px;border-bottom:1px solid var(--line)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;align-items:center}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(38px,4.7vw,62px);line-height:1.06;letter-spacing:-.022em}
+.hero-sub{font-family:var(--serif);font-size:20px;line-height:1.6;color:var(--ink-2);margin-top:22px;max-width:46ch}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.fine{font-size:13px;color:var(--muted);margin-top:16px}
+
+.dossier{background:var(--white);border:1px solid var(--line);border-radius:8px;box-shadow:0 30px 60px -34px rgba(20,33,58,.4);overflow:hidden;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s}
+.dossier:hover{box-shadow:0 42px 84px -30px rgba(20,33,58,.5)}
+.d-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line-2);background:#fbfbfa}
+.d-title{font-family:var(--serif);font-style:italic;font-size:14px}
+.badge{font-size:11.5px;padding:2px 8px;border:1px solid var(--line);border-radius:3px;color:var(--muted);white-space:nowrap;background:var(--white)}
+.badge-real{border-color:var(--steel);color:var(--steel);background:var(--steel-bg)}
+.d-body{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.d-doc{padding:20px 22px;font-family:var(--serif);font-size:13.5px;line-height:1.62;border-right:1px solid var(--line-2)}
+.d-doc h4{font-size:12.5px;margin:0 0 3px;font-weight:700}
+.d-doc section+section{margin-top:13px}
+mark{background:transparent;color:inherit;padding:1px 0;transition:background-color .7s}
+mark.on,html:not(.js) mark{background:var(--hl)}
+.k{display:inline-grid;place-items:center;width:15px;height:15px;margin-left:3px;border-radius:50%;background:var(--seal);color:#fff;font:700 9.5px/1 var(--sans);vertical-align:1px}
+.d-notes{padding:18px;display:grid;gap:12px;align-content:start;background:#fbfbfa}
+.note{border-left:3px solid var(--line);padding:2px 0 2px 12px;font-size:12.5px;line-height:1.5;color:var(--ink-2)}
+.note b{display:flex;align-items:center;gap:6px;color:var(--ink);font-size:13px;margin-bottom:2px}
+.note.high{border-color:var(--seal)}.note.watch{border-color:#c9a227}.note.neg{border-color:var(--steel)}
+.note .k{margin:0}
+.js .note{opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s}
+.js .note.on{opacity:1;transform:none}
+.d-foot{padding:11px 18px;border-top:1px solid var(--line-2);font-size:12.5px;color:var(--muted)}
+
+/* ---------- Constat ---------- */
+.cmp{width:100%;border-collapse:collapse;font-size:15.5px}
+.cmp th,.cmp td{padding:20px 24px 20px 0;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+.cmp thead th{border-top:0;padding-bottom:12px;font-size:13px;font-weight:600;color:var(--muted)}
+.cmp tbody th{font-family:var(--serif);font-size:18px;font-weight:600;width:32%;line-height:1.35}
+.cmp td:nth-child(2){color:var(--muted);width:30%}
+.cmp td:nth-child(3){color:var(--ink)}
+.cmp tbody tr:last-child>*{border-bottom:1px solid var(--line)}
+
+/* ---------- Fonctionnalités ---------- */
+.pillar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:64px;align-items:center;padding:52px 0;border-top:1px solid var(--line)}
+.pillar:first-of-type{border-top:0;padding-top:8px}
+.pillar:nth-of-type(even) .viz{order:-1}
+h3{font-family:var(--serif);font-weight:600;font-size:26px;line-height:1.2;letter-spacing:-.01em}
+.pillar p{margin-top:14px;color:var(--ink-2);max-width:48ch}
+.pillar ul{margin-top:16px;display:grid;gap:8px;font-size:15px;color:var(--ink-2)}
+.pillar li{position:relative;padding-left:22px}
+.pillar li::before,.price li::before{content:"";position:absolute;left:3px;top:.42em;width:6px;height:11px;border:solid currentColor;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.viz{background:var(--white);border:1px solid var(--line);border-radius:8px;padding:24px}
+.chips-row{display:flex;flex-wrap:wrap;gap:8px}
+.ft{font-size:12.5px;font-weight:600;padding:3px 10px;border:1px solid var(--line);border-radius:3px;background:var(--paper);color:var(--ink-2)}
+.kv{margin-top:20px;border-top:1px solid var(--line-2)}
+.kv div{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line-2);font-size:14px}
+.kv dt{color:var(--muted)}
+.kv dd{font-weight:600}
+.src{display:inline-block;font-family:var(--serif);font-style:italic;font-size:12.5px;line-height:1.35;padding:2px 8px;border:1px solid var(--line);border-radius:3px;background:var(--paper);color:var(--ink);font-weight:400;text-align:left}
+.src-ext{display:inline-flex;align-items:center;gap:4px;font-family:var(--serif);font-style:italic;font-size:12.5px;line-height:1.35;padding:2px 8px;margin:2px 6px 6px 0;border:1px solid var(--steel);border-radius:3px;background:var(--steel-bg);color:var(--steel);font-weight:500;text-decoration:none;transition:background-color .15s,color .15s}
+.src-ext:hover{background:var(--steel);color:#fff}
+button.src{cursor:pointer}
+button.src:hover{background:var(--hl-bg);border-color:#c9a227}
+.q{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--ink);border-radius:6px;font-size:14.5px;background:var(--white)}
+.q::before{content:"";flex:none;width:12px;height:12px;border:2px solid var(--ink);border-radius:50%;box-shadow:5px 5px 0 -3px var(--ink)}
+.ans{margin-top:16px;font-size:14.5px;color:var(--ink-2)}
+.ans .src{margin:8px 6px 0 0}
+.ech-mini li{display:grid;grid-template-columns:54px minmax(0,1fr);gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line-2);font-size:14px}
+.ech-mini li:first-child{padding-top:0}
+.ech-mini li:last-child{border-bottom:0;padding-bottom:0}
+.date{display:grid;place-items:center;width:54px;height:54px;border:1px solid var(--line);border-radius:4px;background:var(--paper);text-align:center;line-height:1.1}
+.date b{font-family:var(--serif);font-size:21px;font-weight:600;display:block}
+.date span{font-size:11.5px;color:var(--muted)}
+.also{margin-top:64px;padding-top:36px;border-top:1px solid var(--ink)}
+.also h3{font-size:22px;margin-bottom:22px}
+.also dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:56px}
+.also dl div{padding:16px 0;border-top:1px solid var(--line)}
+.also dt{font-weight:650;font-size:15.5px}
+.also dd{color:var(--ink-2);font-size:14.5px;margin-top:3px}
+.plan{font-size:12px;color:var(--muted);font-weight:400;margin-left:6px}
+
+/* ---------- Démo ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px;margin-bottom:44px}
+.app-search-bar{grid-column:1/-1;position:relative;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--white)}
+.app-search-bar input{width:100%;max-width:420px;min-height:42px;padding:0 14px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font-size:14px;font-family:var(--sans)}
+.app-search-bar input::placeholder{color:var(--muted)}
+.app-search-results{position:absolute;top:calc(100% - 1px);left:16px;right:16px;max-width:420px;background:#fff;border:1px solid var(--line);border-radius:0 0 8px 8px;box-shadow:0 24px 44px -18px rgba(20,33,58,.4);z-index:50;max-height:340px;overflow-y:auto}
+.app-search-results:empty{display:none;border:0;box-shadow:none}
+.app-search-results button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;border-bottom:1px solid var(--line-2);background:#fff;font-size:13.5px;color:var(--ink)}
+.app-search-results button:last-child{border-bottom:0}
+.app-search-results button:hover{background:var(--paper)}
+.app-search-results .asr-type{display:inline-block;min-width:64px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--steel);margin-right:8px}
+.nav-search{position:relative;width:190px}
+.nav-search .search-input{width:100%;min-height:38px;padding:0 12px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font-size:13.5px;font-family:var(--sans)}
+.nav-search .search-input::placeholder{color:var(--muted)}
+.nav-search .search-results{position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--white);border:1px solid var(--line);border-radius:8px;box-shadow:0 20px 40px -20px rgba(20,33,58,.4);overflow:hidden;z-index:45}
+.nav-search .search-results:empty{display:none;border:0;box-shadow:none}
+.search-results button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;border-bottom:1px solid var(--line-2);background:var(--white);font-size:13.5px;color:var(--ink)}
+.search-results button:last-child{border-bottom:0}
+.search-results button:hover{background:var(--paper)}
+.search-results .sr-cat{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+.nav-search-mobile{display:none}
+@media(max-width:900px){
+  #navSearchDesktop{display:none}
+  .nav-search-mobile{display:block;width:100%;margin:2px 0 14px}
+  .nav-search-mobile .search-results{position:static;border:0;box-shadow:none;margin-top:6px}
+  .nav-search-mobile .search-results:not(:empty){border-top:1px solid var(--line-2);border-radius:0}
+}
+.pillar-head{display:flex;align-items:center;gap:13px;margin-bottom:4px}
+.pillar-n{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:50%;background:var(--seal);color:#fff;font-family:var(--serif);font-weight:600;font-size:14px}
+.pillar h3{display:inline-block;border-bottom:2px solid var(--seal);padding-bottom:5px}
+.step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:14px}
+.step-n{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--ink);border-radius:50%;font-family:var(--serif);font-weight:600}
+.step h3{font-size:19px}
+.step p{font-size:14.5px;color:var(--ink-2);margin-top:4px}
+.demo-note{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:14px;font-size:14px;color:var(--ink-2)}
+.app{display:grid;grid-template-columns:212px minmax(0,1fr);background:var(--white);border:1px solid var(--line);border-radius:8px;overflow:hidden;box-shadow:0 30px 60px -38px rgba(20,33,58,.45);min-height:600px}
+.side{background:#0e1a2f;color:#b4c0d0;padding:20px 12px;display:flex;flex-direction:column;gap:2px}
+.side :focus-visible{outline-color:#fff}
+.side .dlogo{display:flex;align-items:center;gap:10px;color:#fff;font-size:12.5px;font-weight:650;letter-spacing:.18em;margin:2px 10px 22px}
+.side .mark{width:14px;height:14px;border-width:1.5px}.side .mark::after{inset:3px}
+.nav-item{text-align:left;background:transparent;border:0;border-radius:5px;padding:9px 10px;font-size:13.5px;color:inherit}
+.nav-item:hover{background:#17273f;color:#fff}
+.nav-item[aria-current="page"]{background:#1f3352;color:#fff}
+.nav-item.soon{opacity:.8}
+.main{padding:28px 30px 30px;min-width:0}
+.view{animation:viewIn .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes viewIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.app-dots{display:none;justify-content:center;gap:7px;margin-top:14px}
+.app-dots .dot{width:6px;height:6px;border-radius:50%;background:var(--line);transition:transform .25s,background-color .25s}
+.app-dots .dot.on{background:var(--ink);transform:scale(1.35)}
+.view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
+.view-head h3{font-size:24px}
+.view-head p{font-size:13.5px;margin-top:2px}
+.avatar{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:50%;background:var(--steel-bg);color:var(--steel);font-size:12px;font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:26px}
+.stat{display:flex;flex-direction:column;gap:2px;text-align:left;padding:14px;border:1px solid var(--line);border-radius:6px;background:var(--white);font-size:12.5px;color:var(--muted)}
+.stat:hover{border-color:var(--ink-2);background:var(--paper)}
+.stat-n{font-family:var(--serif);font-size:32px;font-weight:600;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px}
+.dstatus{font-size:12px;font-weight:600;padding:1px 8px;border-radius:3px;white-space:nowrap;display:inline-block}
+.dstatus-active{color:var(--steel);background:var(--steel-bg)}
+.dstatus-closed{color:var(--muted);background:var(--line-2)}
+.jhead{margin-bottom:6px}
+.jcard{padding:18px 0;border-top:1px solid var(--line)}
+.jcard:first-of-type{border-top:0}
+.jtag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:2px 8px;border-radius:3px;margin-bottom:8px}
+.jtag-texte{background:var(--paper);color:var(--ink-2)}
+.jtag-juris{background:var(--steel-bg);color:var(--steel)}
+.jtag-interne{background:var(--hl-bg);color:var(--amber)}
+.jcard h5{font-family:var(--serif);font-size:17px;font-weight:600;margin-bottom:6px;line-height:1.3}
+.jcard p{font-size:14px;color:var(--ink-2);margin-bottom:10px;line-height:1.55}
+.jcard .jmeta{font-size:12px;color:var(--muted);margin:-4px 0 10px}
+
+/* Rédaction : aperçu d'acte respectant la charte du cabinet */
+.red-form{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:22px}
+.red-form select{min-height:46px;border:1px solid var(--ink);border-radius:6px;padding:0 12px;background:var(--white);font-size:14.5px}
+.acte-shell{max-width:640px;margin:0 auto;background:#fff;border:1px solid var(--line);box-shadow:0 20px 50px -30px rgba(20,33,58,.4);padding:38px 44px;font-family:var(--serif)}
+.acte-entete{border:1px solid var(--ink);background:var(--paper);text-align:center;padding:10px 14px;font-size:12.5px;line-height:1.5;margin-bottom:26px}
+.acte-entete .l1,.acte-entete .l2,.acte-entete .l3{font-weight:700}
+.acte-ident{text-align:right;font-size:13.5px;line-height:1.7;margin-bottom:26px}
+.acte-ident b{font-weight:700}
+.acte-titre{border:3px double var(--ink);text-align:center;font-weight:700;letter-spacing:.04em;padding:12px;margin-bottom:8px;font-size:15px}
+.acte-pagebreak{text-align:center;font-size:11px;color:var(--muted);font-style:italic;margin:22px 0;border-top:1px dashed var(--line);padding-top:6px}
+.acte-section{background:var(--paper);border:1px solid var(--line);text-transform:uppercase;font-weight:700;font-size:13px;letter-spacing:.03em;padding:7px 12px;margin:22px 0 12px}
+.acte-sub{font-weight:700;text-decoration:underline;font-size:13.5px;margin:14px 0 6px}
+.acte-body{font-size:13.5px;line-height:1.75;text-align:justify}
+.acte-piece{font-style:italic}
+.acte-quote{font-style:italic;margin:10px 0 2px;padding-left:14px;border-left:2px solid var(--line)}
+.acte-ref-left{font-style:italic;font-size:12.5px;text-align:left;margin:0 0 12px}
+.acte-ref-right{font-style:italic;font-size:12.5px;text-align:right;margin:0 0 12px}
+.acte-pcm{text-align:center;font-weight:700;letter-spacing:.05em;margin:28px 0 4px;padding:8px 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+.acte-reserves{text-align:right;font-size:12.5px;font-style:italic;margin-top:24px}
+
+/* Statistiques */
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:32px}
+.bars{display:grid;gap:12px}
+.bar-row{display:grid;grid-template-columns:170px minmax(0,1fr) 46px;gap:12px;align-items:center;font-size:13.5px}
+.bar-track{display:block;width:100%;height:10px;background:var(--paper);border-radius:6px;overflow:hidden}
+.bar-fill{display:block;height:100%;background:var(--ink);border-radius:6px}
+
+/* Emails */
+.email-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;padding:14px 0;border-bottom:1px solid var(--line-2);cursor:pointer}
+.email-row:hover{background:var(--paper)}
+.email-row .from{font-weight:650;font-size:14.5px}
+.email-row .subj{font-size:13.5px;color:var(--ink-2)}
+.email-row .when{font-size:12px;color:var(--muted);white-space:nowrap}
+.email-detect{display:inline-block;margin-top:4px}
+.email-body{white-space:pre-line;font-size:14px;line-height:1.7;color:var(--ink-2);margin:18px 0}
+
+/* Paramètres */
+.settings-block{padding:22px 0;border-top:1px solid var(--line)}
+.settings-block:first-of-type{border-top:0;padding-top:0}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line-2);font-size:14px}
+.toggle-row:last-child{border-bottom:0}
+.tgl{position:relative;width:40px;height:22px;border-radius:999px;background:var(--line);border:0;flex:none}
+.tgl.on{background:var(--ink)}
+.tgl::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
+.tgl.on::after{transform:translateX(18px)}
+.two h4,.h4{font-size:14px;font-weight:650;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.rows li{padding:11px 0;border-bottom:1px solid var(--line-2);font-size:14px;line-height:1.45}
+.rows small{display:block;color:var(--muted);font-size:12.5px}
+.tag{display:inline-block;margin-top:5px;padding:1px 8px;border-radius:3px;background:var(--steel-bg);color:var(--steel);font-size:12px;font-weight:600}
+.ask{margin-top:26px;padding:16px 18px;background:var(--paper);border:1px solid var(--line);border-radius:6px}
+.ask p{font-size:14.5px;margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--white);font-size:13.5px;text-align:left}
+.chip:hover{border-color:var(--ink);background:var(--hl-bg)}
+table.docs{width:100%;border-collapse:collapse;font-size:14px}
+.docs th{text-align:left;font-size:12.5px;font-weight:600;color:var(--muted);padding:0 12px 8px 0;border-bottom:1px solid var(--ink)}
+.docs td{padding:11px 12px 11px 0;border-bottom:1px solid var(--line-2);vertical-align:middle}
+.docs td:first-child{font-weight:600}
+.st{font-size:12px;font-weight:600;color:var(--amber);background:var(--hl-bg);padding:1px 8px;border-radius:3px;white-space:nowrap}
+.back{margin-bottom:16px}
+.an-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;align-items:start}
+.contract{position:relative;max-height:520px;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:22px 24px;border:1px solid var(--line);border-radius:6px;background:#fdfdfc;font-family:var(--serif);font-size:14.5px;line-height:1.7;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.contract::-webkit-scrollbar{width:8px}
+.contract::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.contract::-webkit-scrollbar-thumb:hover{background:var(--ink-2)}
+.contract h4{font-size:16px;margin-bottom:6px}
+.contract h5{font-size:14px;margin:18px 0 2px}
+.contract mark{background:var(--hl)}
+.contract mark.flash{background:#e0b92e}
+.finding{padding:16px 0;border-bottom:1px solid var(--line-2)}
+.finding:first-child{padding-top:0}
+.finding header{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-bottom:6px}
+.finding h5{font-family:var(--serif);font-size:16.5px;line-height:1.3}
+.finding p{font-size:13.5px;color:var(--ink-2);margin-top:5px}
+.finding p b{color:var(--ink)}
+.lvl{font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:3px;white-space:nowrap}
+.lvl-high{background:var(--seal-bg);color:var(--seal)}
+.lvl-watch{background:var(--hl-bg);color:var(--amber)}
+.lvl-neg{background:var(--steel-bg);color:var(--steel)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.conf{margin-top:14px;font-size:13px;color:var(--muted)}
+.an-tools{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-bottom:16px}
+.loading{padding:60px 0;text-align:center;color:var(--muted)}
+.loading::before{content:"";display:block;width:26px;height:26px;margin:0 auto 14px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chat-log{max-height:400px;min-height:230px;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:grid;gap:14px;align-content:start;padding:2px 4px 2px 0;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.chat-log::-webkit-scrollbar{width:8px}
+.chat-log::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.msg{max-width:88%;font-size:14.5px;line-height:1.6}
+.msg.user{justify-self:end;background:var(--paper);border:1px solid var(--line);border-radius:10px 10px 2px 10px;padding:9px 14px}
+.msg.bot{border-left:3px solid var(--ink);padding-left:14px}
+.msg .who{font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:3px}
+.msg ol{list-style:decimal;padding-left:20px;display:grid;gap:10px;margin:8px 0}
+.msg ul{list-style:disc;padding-left:20px;display:grid;gap:8px;margin:8px 0}
+.msg li .src,.msg p .src{margin:4px 4px 0 0}
+.msg p+p{margin-top:8px}
+.msg blockquote{margin:8px 0 6px;padding:2px 0 2px 14px;border-left:2px solid var(--line);font-family:var(--serif);font-style:italic}
+.typing{display:inline-flex;align-items:center;gap:5px;height:20px}
+.typing .tdot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:tbounce 1.1s infinite ease-in-out}
+.typing .tdot:nth-child(2){animation-delay:.15s}
+.typing .tdot:nth-child(3){animation-delay:.3s}
+@keyframes tbounce{0%,60%,100%{transform:translateY(0);opacity:.45}30%{transform:translateY(-5px);opacity:1}}
+.chat-form{display:flex;gap:8px;margin-top:16px}
+.chat-form input{flex:1;min-width:0;padding:0 14px;min-height:46px;border:1px solid var(--ink);border-radius:6px;background:var(--white)}
+.chat-hint{font-size:12.5px;color:var(--muted);margin-top:10px}
+.ech-day{margin-bottom:22px}
+.ech-day h4{text-transform:capitalize}
+.ech-empty{padding:12px 14px;border:1px dashed var(--line);border-radius:6px;font-size:13.5px;color:var(--muted)}
+
+/* ---------- Sécurité ---------- */
+.sec-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px}
+.sec-list div{padding:20px 0;border-top:1px solid #34435d}
+.sec-list div:last-child{border-bottom:1px solid #34435d}
+.sec-list dt{font-family:var(--serif);font-size:19px;font-weight:600}
+.sec-list dd{color:#c9d3e0;font-size:15px;margin-top:4px}
+.sec-foot{margin-top:28px;font-size:14px;color:#aebbd0;max-width:52ch}
+
+/* ---------- Tarifs ---------- */
+.freq-toggle{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;gap:2px;padding:4px;margin-bottom:28px;border:1px solid var(--line);border-radius:999px;background:var(--paper)}
+.freq-toggle button{position:relative;z-index:1;min-height:40px;padding:0 18px;border:0;border-radius:999px;background:transparent;font-size:14px;font-weight:600;color:var(--ink-2);display:flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap}
+.freq-toggle button[aria-checked="true"]{color:var(--white)}
+.freq-toggle .save{font-size:11.5px;font-weight:700;color:var(--seal);background:var(--seal-bg);padding:1px 6px;border-radius:999px}
+.freq-toggle button[aria-checked="true"] .save{color:var(--white);background:rgba(255,255,255,.2)}
+.freq-thumb{position:absolute;z-index:0;top:4px;left:4px;width:calc(50% - 4px);height:calc(100% - 8px);border-radius:999px;background:var(--ink);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.bill-note{margin:-8px 0 18px;font-size:12.5px;color:var(--muted)}
+.price.dark .bill-note{color:#b8c4d6}
+.pricing{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;max-width:880px}
+.price{display:flex;flex-direction:column;padding:34px;border:1px solid var(--line);border-radius:8px;background:var(--white)}
+.price.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.price.dark :focus-visible{outline-color:#fff}
+.price h3{font-size:24px}
+.price .who{font-size:14px;color:var(--muted);margin-top:2px}
+.price.dark .who{color:#b8c4d6}
+.amount{font-family:var(--serif);font-size:44px;font-weight:600;line-height:1;margin:22px 0 4px;font-variant-numeric:tabular-nums}
+.amount small{font-family:var(--sans);font-size:14px;font-weight:400;color:var(--muted)}
+.price.dark .amount small{color:#b8c4d6}
+.price ul{display:grid;gap:9px;margin:22px 0 28px;font-size:14.5px;flex:1}
+.price li{position:relative;padding-left:22px;color:var(--ink-2)}
+.price.dark li{color:#dbe3ee}
+.price .btn{width:100%}
+.price.dark .btn{background:#fff;color:var(--ink);border-color:#fff}
+.price.dark .btn:hover{background:var(--paper)}
+.pricing-note{margin-top:20px;font-size:14px;color:var(--muted)}
+
+/* ---------- FAQ ---------- */
+.faq{max-width:820px}
+.faq details{border-top:1px solid var(--line)}
+.faq details:last-child{border-bottom:1px solid var(--line)}
+.faq summary{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px 0;cursor:pointer;list-style:none;font-family:var(--serif);font-size:18px;font-weight:600;line-height:1.35}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";flex:none;font-family:var(--sans);font-size:22px;font-weight:300;line-height:1}
+.faq details[open] summary::after{content:"\2212"}
+.faq p{padding:0 40px 22px 0;color:var(--ink-2);max-width:66ch}
+
+/* ---------- Conclusion ---------- */
+.cta{padding:100px 0;text-align:center}
+.cta .pre{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--seal)}
+.cta .rule{width:96px;height:1px;background:var(--ink);margin:16px auto 22px}
+.cta h2{max-width:22ch;margin-inline:auto}
+.cta p.cta-txt{margin:18px auto 0;max-width:52ch;color:var(--ink-2);font-family:var(--serif);font-size:19px}
+.cta .btn{margin-top:30px}
+.reserve{margin-top:46px;text-align:right;font-family:var(--serif);font-style:italic;font-size:14px;color:var(--muted)}
+
+/* ---------- Pied de page ---------- */
+footer{background:#0b1424;color:#9aa8bb;padding:54px 0 36px}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px}
+.foot-grid .logo{color:#fff}
+.foot-grid p{font-size:14px;margin-top:14px;max-width:34ch}
+.foot-grid h4{color:#fff;font-size:14px;margin-bottom:10px}
+.foot-grid a{display:block;font-size:14px;padding:5px 0}
+.foot-grid a:hover{color:#fff}
+footer :focus-visible{outline-color:#fff}
+.copy{margin-top:38px;padding-top:20px;border-top:1px solid #1d2a40;font-size:12.5px}
+
+/* ---------- Dialogue et toast ---------- */
+dialog{border:0;padding:0;border-radius:10px;width:min(440px,calc(100% - 32px));box-shadow:0 30px 80px rgba(0,0,0,.35);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+dialog::backdrop{background:rgba(10,18,32,.62)}
+.dlg{padding:28px;position:relative}
+.sheet-handle{display:none}
+.dlg .x{position:absolute;right:12px;top:10px;width:40px;height:40px;border:0;background:none;font-size:26px;line-height:1;color:var(--muted)}
+.tabs{display:flex;gap:4px;margin:20px 0 6px;padding:4px;background:var(--paper);border-radius:8px}
+.tabs button{flex:1;border:0;padding:9px;border-radius:5px;background:transparent;font-size:14px}
+.tabs button[aria-selected="true"]{background:var(--white);box-shadow:0 1px 4px rgba(20,33,58,.15);font-weight:600}
+.form label{display:block;margin-top:14px;font-size:13px;color:var(--muted)}
+.form input{display:block;width:100%;min-height:44px;margin-top:4px;padding:0 12px;border:1px solid var(--line);border-radius:6px;color:var(--ink);background:var(--white)}
+.form .btn{width:100%;margin-top:20px}
+.err{margin-top:12px;font-size:13.5px;color:var(--seal)}
+.form-note{margin-top:14px;font-size:12.5px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:60;max-width:min(520px,calc(100% - 32px));padding:12px 18px;border-radius:6px;background:var(--ink);color:#fff;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- Responsive ---------- */
+@media(max-width:1020px){
+  .hero-grid{grid-template-columns:1fr}
+  .d-body{grid-template-columns:1fr}
+  .d-doc{border-right:0;border-bottom:1px solid var(--line-2)}
+  .pillar{grid-template-columns:1fr;gap:28px}
+  .pillar:nth-of-type(even) .viz{order:0}
+  .sec-grid{grid-template-columns:1fr;gap:36px}
+  .an-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:900px){
+  .menu-btn{display:inline-flex;align-items:center}
+  .links{display:none;position:absolute;top:68px;left:0;right:0;flex-direction:column;gap:0;margin:0;padding:8px 24px 16px;background:var(--white);border-bottom:1px solid var(--line)}
+  .links.open{display:flex}
+  .links a{padding:13px 0;border-bottom:1px solid var(--line-2);font-size:16px}
+  .nav-in{gap:12px}
+  .app{grid-template-columns:1fr}
+  .app-dots{display:flex}
+  .side{flex-direction:row;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:10px;gap:4px}
+  .side::-webkit-scrollbar{display:none}
+  .side .dlogo{display:none}
+  .nav-item{white-space:nowrap}
+  .steps{grid-template-columns:1fr;gap:22px}
+  .pricing{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .also dl{grid-template-columns:1fr}
+  .two{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .cmp thead{display:none}
+  .cmp tr{display:block;padding:20px 0;border-top:1px solid var(--line)}
+  .cmp tbody tr:last-child{border-bottom:1px solid var(--line)}
+  .cmp th,.cmp td,.cmp tbody th{display:block;width:auto;padding:2px 0;border:0}
+  .cmp tbody tr:last-child>*{border:0}
+  .cmp td{margin-top:8px}
+  .cmp td::before{content:attr(data-l);display:block;font-size:12px;font-weight:600;color:var(--muted)}
+  .docs thead{display:none}
+  .docs tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:12px 0;border-bottom:1px solid var(--line-2)}
+  .docs td{border:0;padding:0}
+  .docs td:nth-child(2),.docs td:nth-child(3){grid-column:1;color:var(--muted);font-size:13px}
+  .docs td:nth-child(4){grid-column:2;grid-row:1}
+  .docs td:nth-child(5){grid-column:2;grid-row:2}
+}
+@media(max-width:560px){
+  .wrap{width:min(var(--wrap),calc(100% - 32px))}
+  .sec{padding:72px 0}
+  .hero{padding:56px 0 64px}
+  .sec-head{grid-template-columns:1fr;gap:0;margin-bottom:36px}
+  .main{padding:22px 16px}
+  .foot-grid{grid-template-columns:1fr}
+  .kv div{grid-template-columns:1fr;gap:2px}
+  .stats{gap:8px}
+  .msg{max-width:100%}
+  .price{padding:26px}
+  .hero-sub,.lead{font-size:17.5px}
+  .logo{letter-spacing:.14em}
+  dialog#auth{position:fixed;inset:auto 0 0 0;margin:0;width:100%;max-width:none;max-height:88vh;border-radius:16px 16px 0 0;overflow:auto}
+  .sheet-handle{display:block;width:40px;height:4px;padding:0;margin:0 auto 16px;border:0;border-radius:2px;background:var(--line)}
+}
+@media(max-width:340px){
+  .nav-in{gap:6px}
+  .menu-btn{padding:0 10px;font-size:13px}
+  .btn-sm{padding:0 12px;font-size:13.5px}
+  .logo{letter-spacing:.08em;font-size:15px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body id="top">
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="logo" href="#top" aria-label="Attesto, retour en haut de page"><span class="mark" aria-hidden="true"></span>ATTESTO</a>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu">Menu</button>
+    <nav class="links" id="menu" aria-label="Navigation principale">
+      <div class="nav-search nav-search-mobile">
+        <label class="sr-only" for="searchInputMobile">Rechercher sur cette page</label>
+        <input type="search" class="search-input" id="searchInputMobile" placeholder="Rechercher…" autocomplete="off">
+        <div class="search-results" id="searchResultsMobile"></div>
+      </div>
+      <a href="#fonctionnalites">Fonctionnalités</a>
+      <a href="#demo">Démo</a>
+      <a href="#securite">Sécurité</a>
+      <a href="#tarifs">Tarifs</a>
+      <a href="#faq">Questions</a>
+    </nav>
+    <div class="nav-search" id="navSearchDesktop">
+      <label class="sr-only" for="searchInputDesktop">Rechercher sur cette page</label>
+      <input type="search" class="search-input" id="searchInputDesktop" placeholder="Rechercher…" autocomplete="off">
+      <div class="search-results" id="searchResultsDesktop"></div>
+    </div>
+    <button class="btn btn-primary btn-sm" data-auth="login">Se connecter</button>
+  </div>
+</header>
+
+<main id="contenu">
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <h1>Un assistant juridique qui cite ses sources.</h1>
+      <p class="hero-sub">Attesto lit vos documents, retrouve l'information dans vos dossiers et prépare vos analyses. Vous vérifiez, vous décidez.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#demo" data-godemo>Explorer la démo</a>
+        <a class="btn" href="#fonctionnalites">Voir les fonctionnalités</a>
+      </div>
+      <p class="fine">La démo utilise un cabinet fictif. Aucune donnée à fournir.</p>
+    </div>
+
+    <figure class="dossier" aria-label="Exemple d'analyse d'un contrat fictif">
+      <div class="d-head">
+        <span class="d-title">Pièce n° 1 : Contrat de maintenance</span>
+        <span class="badge">Données fictives</span>
+      </div>
+      <div class="d-body">
+        <div class="d-doc">
+          <section>
+            <h4>Article 4 : Prix</h4>
+            <p>Le prix annuel de la maintenance est fixé à 48 000 € HT.</p>
+          </section>
+          <section>
+            <h4>Article 9 : Retard d'intervention</h4>
+            <p>En cas de retard, le Prestataire verse au Client <mark data-k="a">une pénalité de 5 % du prix annuel par jour de retard, sans plafond</mark><span class="k" aria-hidden="true">a</span>.</p>
+          </section>
+          <section>
+            <h4>Article 12 : Durée</h4>
+            <p>Le contrat est <mark data-k="b">reconduit tacitement pour trois ans</mark><span class="k" aria-hidden="true">b</span>, sauf dénonciation six mois avant le terme.</p>
+          </section>
+          <section>
+            <h4>Article 14 : Résiliation</h4>
+            <p>Le Client peut <mark data-k="c">résilier à tout moment, sans préavis ni indemnité</mark><span class="k" aria-hidden="true">c</span>.</p>
+          </section>
+        </div>
+        <ol class="d-notes">
+          <li class="note high" data-k="a"><b><span class="k">a</span>Pénalité sans plafond</b>2 400 € par jour : le prix annuel est atteint en 20 jours. Le juge peut modérer une pénalité manifestement excessive (art. 1231-5 C. civ.).</li>
+          <li class="note watch" data-k="b"><b><span class="k">b</span>Reconduction tacite</b>Dénonciation à notifier avant le 30 juin 2027. Proposée pour vos échéances.</li>
+          <li class="note neg" data-k="c"><b><span class="k">c</span>Résiliation non réciproque</b>Aucune faculté équivalente pour le Prestataire. À négocier.</li>
+        </ol>
+      </div>
+      <figcaption class="d-foot">Analyse pour Nova Services, le Prestataire. Chaque point renvoie à son article.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ================= I. CONSTAT ================= -->
+<section class="sec" id="constat">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="rn" aria-hidden="true">I.</span>
+      <div>
+        <h2 class="wide-h2">Le jugement de l'avocat ne se délègue pas. La préparation, si.</h2>
+        <p class="lead">Documents, recherches, emails, échéances : les cabinets jonglent entre plusieurs outils pour préparer ce qui précède la décision. Attesto rassemble ces tâches dans un seul espace.</p>
+      </div>
+    </div>
+    <table class="cmp">
+      <caption class="sr-only">Quatre tâches du cabinet, avec et sans Attesto</caption>
+      <thead><tr><th scope="col">La tâche</th><th scope="col">Aujourd'hui</th><th scope="col">Avec Attesto</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Relire un contrat de plusieurs dizaines de pages</th><td data-l="Aujourd'hui">Lecture intégrale, notes à la main, clauses à retrouver.</td><td data-l="Avec Attesto">Les clauses à risque sont repérées et renvoyées à leur article.</td></tr>
+        <tr><th scope="row">Retrouver l'email où le client a donné son accord</th><td data-l="Aujourd'hui">Recherche dans la messagerie, puis dans les pièces jointes.</td><td data-l="Avec Attesto">Une question. La réponse cite l'email et la pièce concernés.</td></tr>
+        <tr><th scope="row">Suivre les délais et les échéances</th><td data-l="Aujourd'hui">Report manuel depuis les courriers, les emails et les avis.</td><td data-l="Avec Attesto">Les délais repérés rejoignent un agenda unique.</td></tr>
+        <tr><th scope="row">Préparer un compte rendu de rendez-vous</th><td data-l="Aujourd'hui">Réécriture des notes après le rendez-vous.</td><td data-l="Avec Attesto">Un premier jet structuré, à relire et corriger.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= II. FONCTIONNALITÉS ================= -->
+<section class="sec sec-paper" id="fonctionnalites">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="rn" aria-hidden="true">II.</span>
+      <div>
+        <h2>Tout votre cabinet, au même endroit.</h2>
+        <p class="lead">Trois fonctions structurent Attesto. Les autres outils restent accessibles depuis le même espace.</p>
+      </div>
+    </div>
+
+    <article class="pillar" id="pillar-analyse">
+      <div>
+        <div class="pillar-head"><span class="pillar-n" aria-hidden="true">1</span><h3>Analyse de documents</h3></div>
+        <p>Importez PDF, Word, Excel, PowerPoint, images ou fichiers texte. Attesto repère les parties, les montants, les dates et les clauses sensibles, et renvoie chaque information à son emplacement dans le document.</p>
+        <ul><li>Une note d'analyse à copier dans votre dossier</li><li>Les échéances proposées pour votre agenda</li></ul>
+      </div>
+      <div class="viz">
+        <div class="chips-row" aria-label="Formats acceptés"><span class="ft">PDF</span><span class="ft">Word</span><span class="ft">Excel</span><span class="ft">PowerPoint</span><span class="ft">Image</span><span class="ft">Texte</span></div>
+        <dl class="kv">
+          <div><dt>Parties</dt><dd>Horizon Industries SAS, Nova Services SARL</dd><dd><span class="src">Préambule</span></dd></div>
+          <div><dt>Prix</dt><dd>48 000 € HT par an</dd><dd><span class="src">Art. 4</span></dd></div>
+          <div><dt>Durée</dt><dd>3 ans, reconduction tacite</dd><dd><span class="src">Art. 12</span></dd></div>
+          <div><dt>Clauses à risque</dt><dd>3 points repérés</dd><dd><span class="src">Art. 9, 12, 14</span></dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <article class="pillar" id="pillar-recherche">
+      <div>
+        <div class="pillar-head"><span class="pillar-n" aria-hidden="true">2</span><h3>Recherche intelligente</h3></div>
+        <p>Posez la question comme à un collaborateur. La réponse cite la pièce, l'email ou le texte dont elle provient : vous vérifiez en un clic avant d'utiliser l'information.</p>
+        <ul><li>Recherche dans l'ensemble de vos dossiers</li><li>Sources juridiques avec leurs références</li></ul>
+      </div>
+      <div class="viz">
+        <div class="q">Où Mme Marchand a-t-elle validé le devis ?</div>
+        <div class="ans">
+          <p>Par email le 12 mars 2026, pour 1 850 € HT. Le montant correspond au devis signé.</p>
+          <span class="src">Email du 12 mars 2026</span><span class="src">Pièce n° 3 : Devis n° 2026-031 signé</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="pillar" id="pillar-gestion">
+      <div>
+        <div class="pillar-head"><span class="pillar-n" aria-hidden="true">3</span><h3>Gestion du cabinet</h3></div>
+        <p>Dossiers, échéances, emails, comptes-rendus et statistiques sont réunis dans un tableau de bord centralisé. Ce qui presse apparaît en premier.</p>
+        <ul><li>Un agenda alimenté par vos documents et vos emails</li><li>Un suivi partagé pour toute l'équipe</li></ul>
+      </div>
+      <div class="viz">
+        <ul class="ech-mini">
+          <li><span class="date"><b>21</b><span>sept.</span></span><span>Conclusions en réplique<br><span class="muted">Marchand c/ SCI Les Tilleuls</span></span></li>
+          <li><span class="date"><b>23</b><span>sept.</span></span><span>Audience de mise en état<br><span class="muted">Marchand c/ SCI Les Tilleuls</span></span></li>
+          <li><span class="date"><b>25</b><span>sept.</span></span><span>Communication des pièces<br><span class="muted">Succession Lefèvre</span></span></li>
+        </ul>
+      </div>
+    </article>
+
+    <div class="also">
+      <h3>Et aussi, depuis le même espace</h3>
+      <dl>
+        <div id="also-redaction"><dt>Aide à la rédaction<span class="plan">Pro et Cabinet</span></dt><dd>Premiers jets d'actes et de courriers à partir des pièces du dossier, à relire et corriger.</dd></div>
+        <div id="also-recherche"><dt>Recherche juridique<span class="plan">Pro et Cabinet</span></dt><dd>Sources juridiques avec leurs références, à vérifier avant de les citer.</dd></div>
+        <div id="also-echeances"><dt>Échéances et emails<span class="plan">Pro et Cabinet</span></dt><dd>Les délais repérés dans vos messages et vos documents rejoignent votre agenda.</dd></div>
+        <div id="also-cr"><dt>Comptes-rendus de rendez-vous<span class="plan">Cabinet</span></dt><dd>Notes structurées à partir de vos échanges avec le client.</dd></div>
+        <div id="also-stats"><dt>Statistiques et droits d'accès<span class="plan">Cabinet</span></dt><dd>Suivi de l'activité et gestion des droits, utilisateur par utilisateur.</dd></div>
+        <div id="also-carpa"><dt>Suivi CARPA<span class="plan">Pro et Cabinet</span></dt><dd>Un aide-mémoire par dossier pour les fonds maniés pour le compte du client, utile notamment en indemnisation.</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ================= III. DÉMO ================= -->
+<section class="sec" id="demo">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="rn" aria-hidden="true">III.</span>
+      <div>
+        <h2 class="wide-h2">Essayez Attesto sur un cabinet fictif.</h2>
+        <p class="lead">Analysez un contrat, posez une question à l'assistant, consultez les échéances. Toutes les données sont inventées et rien n'est envoyé.</p>
+      </div>
+    </div>
+
+    <ol class="steps">
+      <li class="step"><span class="step-n" aria-hidden="true">1</span><div><h3>Importez</h3><p>Ajoutez vos documents ou explorez un cabinet de démonstration pré-rempli.</p></div></li>
+      <li class="step"><span class="step-n" aria-hidden="true">2</span><div><h3>Demandez</h3><p>Posez votre question, demandez une analyse ou lancez une recherche.</p></div></li>
+      <li class="step"><span class="step-n" aria-hidden="true">3</span><div><h3>Exploitez</h3><p>Obtenez une réponse structurée, avec les éléments du dossier et les sources utilisées.</p></div></li>
+    </ol>
+
+    <p class="demo-note"><span class="badge">Données fictives</span> Cabinet Dupont &amp; Associés, lundi 21 septembre 2026.</p>
+
+    <div class="app">
+      <div class="app-search-bar">
+        <label class="sr-only" for="appSearchInput">Rechercher un dossier, un document, un email…</label>
+        <input type="search" id="appSearchInput" placeholder="Rechercher un dossier, un document, un email…" autocomplete="off">
+        <div class="app-search-results" id="appSearchResults"></div>
+      </div>
+      <nav class="side" aria-label="Sections de la démo">
+        <div class="dlogo"><span class="mark" aria-hidden="true"></span>ATTESTO</div>
+        <button class="nav-item" data-view="dash" aria-current="page">Tableau de bord</button>
+        <button class="nav-item" data-view="dossiers">Mes dossiers</button>
+        <button class="nav-item" data-view="docs">Documents</button>
+        <button class="nav-item" data-view="recherche">Recherche juridique</button>
+        <button class="nav-item" data-view="redaction">Rédaction</button>
+        <button class="nav-item" data-view="ask">Assistant Attesto</button>
+        <button class="nav-item" data-view="ech">Échéances</button>
+        <button class="nav-item" data-view="carpa">CARPA</button>
+        <button class="nav-item" data-view="emails">Emails</button>
+        <button class="nav-item" data-view="stats">Statistiques</button>
+        <button class="nav-item" data-view="params">Paramètres</button>
+      </nav>
+
+      <div class="main" id="appMain" tabindex="-1">
+        <!-- Tableau de bord -->
+        <section class="view" id="view-dash" aria-label="Tableau de bord"></section>
+
+        <!-- Mes dossiers -->
+        <section class="view" id="view-dossiers" aria-label="Mes dossiers" hidden>
+          <div id="dossierList">
+            <div class="view-head"><div><h3>Mes dossiers</h3><p class="muted">6 dossiers sur 24, triés par activité récente</p></div><span class="avatar" aria-hidden="true">MD</span></div>
+            <table class="docs">
+              <thead><tr><th scope="col">Dossier</th><th scope="col">Nature</th><th scope="col">Statut</th><th scope="col"><span class="sr-only">Action</span></th></tr></thead>
+              <tbody id="dossierRows"></tbody>
+            </table>
+          </div>
+          <div id="dossierDetail" hidden>
+            <button class="btn-line back" id="backDossiers">Retour aux dossiers</button>
+            <div id="dossierDetailBody"></div>
+          </div>
+        </section>
+
+        <!-- Documents -->
+        <section class="view" id="view-docs" aria-label="Documents" hidden>
+          <div id="docList">
+            <div class="view-head"><div><h3>Documents</h3><p class="muted">8 documents à analyser</p></div><span class="avatar" aria-hidden="true">MD</span></div>
+            <table class="docs">
+              <thead><tr><th scope="col">Document</th><th scope="col">Dossier</th><th scope="col">Type</th><th scope="col">Statut</th><th scope="col"><span class="sr-only">Action</span></th></tr></thead>
+              <tbody id="docRows"></tbody>
+            </table>
+          </div>
+          <div id="docAn" hidden>
+            <button class="btn-line back" id="backDocs">Retour aux documents</button>
+            <div id="anLoad" class="loading" role="status" hidden>Attesto lit le contrat…</div>
+            <div id="anBody" hidden>
+              <div class="an-tools">
+                <div><h3>Contrat de maintenance Horizon-Nova</h3><p class="muted" style="font-size:13.5px;margin-top:2px">Analyse pour Nova Services, le Prestataire. 3 points, 1 article conforme (art. 4).</p></div>
+                <button class="btn-line" id="copyNote">Copier la note d'analyse</button>
+              </div>
+              <div class="an-grid">
+                <div class="contract" id="contract" tabindex="0" aria-label="Texte du contrat"></div>
+                <div id="findings"></div>
+              </div>
+              <p class="conf">Analyse préparée pour la démo. Dans l'usage réel, vérifiez chaque point dans le document et à la source avant de l'utiliser.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Recherche juridique -->
+        <section class="view" id="view-recherche" aria-label="Recherche juridique" hidden>
+          <div class="view-head"><div><h3>Recherche juridique</h3><p class="muted">Textes et jurisprudence, avec leur référence à vérifier avant de citer.</p></div><span class="avatar" aria-hidden="true">MD</span></div>
+          <form class="chat-form" id="jurisForm">
+            <label class="sr-only" for="jurisInput">Votre recherche</label>
+            <input id="jurisInput" type="text" autocomplete="off" placeholder="Rechercher un texte ou une décision…">
+            <button class="btn btn-primary" type="submit">Rechercher</button>
+          </form>
+          <div class="chips" style="margin-top:14px" id="jurisChips">
+            <button class="chip" data-juris="penalite">Pénalité manifestement excessive</button>
+            <button class="chip" data-juris="reconduction">Reconduction tacite</button>
+            <button class="chip" data-juris="desequilibre">Clause déséquilibrée entre les parties</button>
+          </div>
+          <div id="jurisResults"><p class="muted" style="margin-top:18px">Choisissez une recherche ci-dessus, ou tapez la vôtre.</p></div>
+        </section>
+
+        <!-- Rédaction -->
+        <section class="view" id="view-redaction" aria-label="Rédaction" hidden></section>
+
+        <!-- Assistant -->
+        <section class="view" id="view-ask" aria-label="Assistant Attesto" hidden>
+          <div class="view-head"><div><h3>Assistant Attesto</h3><p class="muted">Interrogez vos dossiers. Chaque réponse cite ses sources.</p></div><span class="avatar" aria-hidden="true">MD</span></div>
+          <div class="chat-log" id="chatLog" role="log" aria-live="polite" aria-label="Conversation">
+            <div class="msg bot"><p class="who">Attesto</p><p>Bonjour Maître Dupont. Posez une question sur vos dossiers, ou choisissez un exemple ci-dessous.</p></div>
+          </div>
+          <div class="chips" style="margin-top:16px" id="askChips">
+            <button class="chip" data-ask="risques">Quelles sont les clauses à risque du contrat Horizon ?</button>
+            <button class="chip" data-ask="email">Retrouve l'email où Mme Marchand accepte le devis</button>
+            <button class="chip" data-ask="ech">Quelles sont mes échéances de la semaine ?</button>
+            <button class="chip" data-ask="marchand">Fais un point sur le dossier Marchand</button>
+            <button class="chip" data-ask="lefevre">Où en est la succession Lefèvre ?</button>
+            <button class="chip" data-ask="carpa_q">Reste-t-il des fonds à reverser sur un dossier ?</button>
+            <button class="chip" data-ask="todo">Quels documents dois-je encore analyser ?</button>
+          </div>
+          <form class="chat-form" id="chatForm">
+            <label class="sr-only" for="chatInput">Votre question</label>
+            <input id="chatInput" type="text" autocomplete="off" placeholder="Posez votre question…">
+            <button class="btn btn-primary" type="submit">Envoyer</button>
+          </form>
+          <p class="chat-hint">Essayez une suggestion, ou écrivez votre propre question dans le champ ci-dessus.</p>
+        </section>
+
+        <!-- Échéances -->
+        <section class="view" id="view-ech" aria-label="Échéances" hidden></section>
+        <section class="view" id="view-carpa" aria-label="CARPA" hidden></section>
+        <section class="view" id="view-emails" aria-label="Emails" hidden></section>
+        <section class="view" id="view-stats" aria-label="Statistiques" hidden></section>
+        <section class="view" id="view-params" aria-label="Paramètres" hidden></section>
+      </div>
+    </div>
+    <div class="app-dots" aria-hidden="true">
+      <span class="dot on" data-dot="dash"></span><span class="dot" data-dot="dossiers"></span><span class="dot" data-dot="docs"></span><span class="dot" data-dot="recherche"></span><span class="dot" data-dot="redaction"></span><span class="dot" data-dot="ask"></span><span class="dot" data-dot="ech"></span><span class="dot" data-dot="carpa"></span><span class="dot" data-dot="emails"></span><span class="dot" data-dot="stats"></span><span class="dot" data-dot="params"></span>
+    </div>
+    <p class="fine sr-only" id="swipeHint">Sur mobile, balayez l&#8217;écran à gauche ou à droite pour changer de section.</p>
+  </div>
+</section>
+
+<!-- ================= IV. SÉCURITÉ ================= -->
+<section class="sec sec-dark" id="securite">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="rn" aria-hidden="true">IV.</span>
+      <div>
+        <h2 class="wide-h2">Vos dossiers restent confidentiels.</h2>
+      </div>
+    </div>
+    <div class="sec-grid">
+      <div>
+        <p class="lead" style="margin-top:0">Les correspondances échangées entre l'avocat et son client sont couvertes par le secret professionnel (article 66-5 de la loi du 31 décembre 1971). Attesto est conçu autour de cette exigence : protection des données, hébergement en Europe, chiffrement et contrôle des accès.</p>
+        <p class="sec-foot">Cette page est une démonstration. Aucun document n'y est envoyé et aucune donnée saisie n'est conservée.</p>
+      </div>
+      <dl class="sec-list">
+        <div><dt>Protection des données</dt><dd>Les données du cabinet restent sous le contrôle du cabinet. La confidentialité est pensée dès la conception.</dd></div>
+        <div><dt>Hébergement en Europe</dt><dd>Vos données sont conservées dans un environnement européen.</dd></div>
+        <div><dt>Chiffrement</dt><dd>Les échanges et les données sensibles sont chiffrés.</dd></div>
+        <div><dt>Accès contrôlés</dt><dd>Chaque utilisateur accède uniquement aux dossiers qui lui sont ouverts.</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ================= V. TARIFS ================= -->
+<section class="sec" id="tarifs">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="rn" aria-hidden="true">V.</span>
+      <div><h2 class="wide-h2">Deux offres, selon la taille de votre cabinet.</h2></div>
+    </div>
+
+    <div class="freq-toggle" role="radiogroup" aria-label="Fréquence de facturation">
+      <span class="freq-thumb" aria-hidden="true"></span>
+      <button type="button" role="radio" aria-checked="true" data-freq="m">Mensuel</button>
+      <button type="button" role="radio" aria-checked="false" data-freq="a">Annuel<span class="save">&minus;15 %</span></button>
+    </div>
+
+    <div class="pricing">
+      <article class="price">
+        <h3>Attesto Pro</h3>
+        <p class="who">Pour un avocat, seul.</p>
+        <p class="amount" id="proAmount">99 €<small> HT / mois</small></p>
+        <p class="bill-note" id="proNote" hidden>Facturé annuellement, soit 1&#8239;009,80&nbsp;€&nbsp;HT.</p>
+        <ul>
+          <li>Analyse de documents</li><li>Recherche dans les dossiers</li><li>Assistant IA</li><li>Recherche juridique</li><li>Aide à la rédaction</li><li>Échéances et emails</li><li>1 utilisateur</li>
+        </ul>
+        <button class="btn btn-primary" data-auth="signup">Choisir Pro</button>
+      </article>
+      <article class="price dark">
+        <h3>Attesto Cabinet</h3>
+        <p class="who">Pour une équipe, jusqu'à 10 utilisateurs.</p>
+        <p class="amount" id="cabAmount">299 €<small> HT / mois</small></p>
+        <p class="bill-note" id="cabNote" hidden>Facturé annuellement, soit 3&#8239;049,80&nbsp;€&nbsp;HT.</p>
+        <ul>
+          <li>Tout Attesto Pro</li><li>Jusqu'à 10 utilisateurs</li><li>Gestion centralisée des dossiers</li><li>Recherche dans tous les dossiers</li><li>Comptes-rendus de rendez-vous</li><li>Statistiques et droits utilisateurs</li><li>Support prioritaire</li>
+        </ul>
+        <button class="btn" data-auth="signup">Choisir Cabinet</button>
+      </article>
+    </div>
+    <p class="pricing-note">Grands cabinets : offre sur devis. Tarifs HT, hors engagement.</p>
+  </div>
+</section>
+
+<!-- ================= VI. FAQ ================= -->
+<section class="sec sec-paper" id="faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="rn" aria-hidden="true">VI.</span>
+      <div><h2>Questions fréquentes</h2></div>
+    </div>
+    <div class="faq">
+      <details id="faq-1"><summary>Attesto remplace-t-il un avocat ?</summary><p>Non. Attesto est un outil d'assistance destiné aux professionnels du droit. Il ne se substitue pas à leur jugement : c'est l'avocat qui vérifie, décide et signe.</p></details>
+      <details id="faq-2"><summary>Attesto peut-il se tromper ?</summary><p>Oui, comme tout assistant fondé sur l'intelligence artificielle. C'est pourquoi chaque réponse renvoie à la pièce, à l'email ou au texte dont elle provient : vous contrôlez avant d'utiliser l'information, et vous la citez à la source.</p></details>
+      <details id="faq-3"><summary>Mes données et mes dossiers sont-ils confidentiels ?</summary><p>Oui. Attesto est conçu autour de la confidentialité : protection des données, chiffrement et contrôle des accès, dans le respect du secret professionnel.</p></details>
+      <details id="faq-4"><summary>Où sont hébergées les données ?</summary><p>En Europe.</p></details>
+      <details id="faq-5"><summary>Attesto est-il adapté à tous les domaines du droit ?</summary><p>Attesto est une solution généraliste, destinée aux différentes spécialités juridiques : contrats, contentieux, famille, pénal, dommage corporel et autres.</p></details>
+      <details id="faq-6"><summary>Quels types de documents puis-je analyser ?</summary><p>PDF, Word, Excel, PowerPoint, images et fichiers texte.</p></details>
+      <details id="faq-7"><summary>Combien coûte Attesto ?</summary><p>Attesto Pro coûte 99 € HT par mois pour un utilisateur. Attesto Cabinet coûte 299 € HT par mois, jusqu'à 10 utilisateurs. Les grands cabinets disposent d'une offre sur devis.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONCLUSION ================= -->
+<section class="cta">
+  <div class="wrap">
+    <p class="pre">Par ces motifs,</p>
+    <div class="rule" aria-hidden="true"></div>
+    <h2>essayez Attesto sur un cabinet fictif.</h2>
+    <p class="cta-txt">Un contrat à analyser, une question à poser, des échéances à consulter. Cinq minutes suffisent pour juger.</p>
+    <a class="btn btn-primary" href="#demo" data-godemo>Explorer la démo</a>
+    <p class="reserve">Sous toutes réserves.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="logo"><span class="mark" aria-hidden="true"></span>ATTESTO</div>
+      <p>Votre assistant juridique intelligent. Un outil d'assistance : il ne se substitue pas au jugement de l'avocat.</p>
+    </div>
+    <div><h4>Produit</h4><a href="#fonctionnalites">Fonctionnalités</a><a href="#tarifs">Tarifs</a><a href="#demo">Démonstration</a><a href="#securite">Sécurité</a></div>
+    <div><h4>Ressources</h4><a href="#faq">Questions fréquentes</a><a href="#" data-soon="Centre d'aide">Centre d'aide</a><a href="#" data-soon="Contact">Contact</a></div>
+    <div><h4>Légal</h4><a href="#" data-soon="Mentions légales">Mentions légales</a><a href="#" data-soon="Politique de confidentialité">Politique de confidentialité</a><a href="#" data-soon="CGU">CGU</a><a href="#" data-soon="Cookies">Cookies</a></div>
+  </div>
+  <div class="wrap copy">© 2026 Attesto. Tous droits réservés.</div>
+</footer>
+
+<!-- ================= Connexion de démonstration ================= -->
+<dialog id="auth" aria-labelledby="authTitle">
+  <div class="dlg">
+    <button class="sheet-handle" type="button" id="sheetHandle" aria-label="Faire glisser vers le bas pour fermer"></button>
+    <button class="x" type="button" data-close aria-label="Fermer">×</button>
+    <div class="logo" id="authTitle"><span class="mark" aria-hidden="true"></span>ATTESTO</div>
+    <div class="tabs" role="tablist" aria-label="Mode">
+      <button type="button" role="tab" id="loginTab" aria-selected="true" data-mode="login">Se connecter</button>
+      <button type="button" role="tab" id="signupTab" aria-selected="false" data-mode="signup">Créer un compte</button>
+    </div>
+    <form class="form" id="authForm" novalidate>
+      <div id="nameFields" hidden>
+        <label>Prénom<input name="prenom" autocomplete="off"></label>
+        <label>Nom<input name="nom" autocomplete="off"></label>
+        <label>Nom du cabinet<input name="cabinet" autocomplete="off"></label>
+      </div>
+      <label>Adresse email professionnelle<input type="email" name="email" autocomplete="off" required></label>
+      <label>Mot de passe<input type="password" name="pw" autocomplete="off" required></label>
+      <label id="confirmWrap" hidden>Confirmer le mot de passe<input type="password" name="pw2" autocomplete="off"></label>
+      <p class="err" id="authErr" role="alert" hidden></p>
+      <button class="btn btn-primary" type="submit" id="submitBtn">Se connecter</button>
+      <p class="form-note">Mode démonstration : aucune donnée saisie ici n'est envoyée ni conservée. Vous accédez à un cabinet fictif.</p>
+    </form>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+document.documentElement.classList.add('js');
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Toast ---------- */
+var tt;
+function toast(msg){var t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show')},4200)}
+
+/* ---------- Menu mobile ---------- */
+var menuBtn=$('#menuBtn'),menu=$('#menu');
+menuBtn.addEventListener('click',function(){var o=menu.classList.toggle('open');menuBtn.setAttribute('aria-expanded',o)});
+menu.addEventListener('click',function(e){if(e.target.closest('a')){menu.classList.remove('open');menuBtn.setAttribute('aria-expanded','false')}});
+
+/* ---------- Recherche sur la page ---------- */
+var SEARCH_INDEX=[
+  {label:'Fonctionnalités',kw:'fonctionnalités présentation',id:'fonctionnalites'},
+  {label:'Analyse de documents',kw:'analyse documents pdf contrat clauses risque parties',id:'pillar-analyse'},
+  {label:'Recherche intelligente',kw:'recherche intelligente question réponse dossier',id:'pillar-recherche'},
+  {label:'Gestion du cabinet',kw:'gestion cabinet dossiers échéances emails tableau de bord agenda',id:'pillar-gestion'},
+  {label:'Aide à la rédaction',kw:'rédaction actes courriers conclusions assignation premier jet',id:'also-redaction'},
+  {label:'Recherche juridique',kw:'recherche juridique jurisprudence légifrance texte de loi article',id:'also-recherche'},
+  {label:'Échéances et emails',kw:'échéances emails agenda délais boîte de réception',id:'also-echeances'},
+  {label:'Comptes-rendus de rendez-vous',kw:'comptes-rendus rendez-vous notes réunion',id:'also-cr'},
+  {label:'Statistiques et droits d\u2019accès',kw:'statistiques droits accès utilisateurs activité',id:'also-stats'},
+  {label:'Suivi CARPA',kw:'carpa fonds client indemnisation reversement honoraires',id:'also-carpa'},
+  {label:'Démo',kw:'démo essayer démonstration tester',id:'demo'},
+  {label:'Sécurité et confidentialité',kw:'sécurité confidentialité secret professionnel données chiffrement hébergement',id:'securite'},
+  {label:'Tarifs',kw:'tarifs prix abonnement pro cabinet mensuel annuel formule',id:'tarifs'},
+  {label:'Attesto remplace-t-il un avocat ?',kw:'remplace avocat jugement décide',id:'faq-1',open:true},
+  {label:'Attesto peut-il se tromper ?',kw:'tromper erreur fiabilité hallucination',id:'faq-2',open:true},
+  {label:'Mes données sont-elles confidentielles ?',kw:'données confidentielles secret professionnel',id:'faq-3',open:true},
+  {label:'Où sont hébergées les données ?',kw:'hébergement europe serveur',id:'faq-4',open:true},
+  {label:'Domaines du droit couverts',kw:'domaines droit famille pénal contentieux dommage corporel',id:'faq-5',open:true},
+  {label:'Types de documents analysables',kw:'types documents pdf word excel powerpoint image texte',id:'faq-6',open:true},
+  {label:'Combien coûte Attesto ?',kw:'combien coûte prix tarif abonnement',id:'faq-7',open:true}
+];
+function siteSearch(query,resultsEl){
+  query=query.trim().toLowerCase();
+  if(!query){resultsEl.innerHTML='';return}
+  var matches=SEARCH_INDEX.filter(function(e){return e.label.toLowerCase().indexOf(query)>-1||e.kw.indexOf(query)>-1}).slice(0,6);
+  resultsEl.innerHTML=matches.length?matches.map(function(e){
+    return '<button type="button" data-goto-id="'+e.id+'"'+(e.open?' data-open-faq="1"':'')+'>'+e.label+(e.open?'<span class="sr-cat">Question fréquente</span>':'')+'</button>';
+  }).join(''):'<button type="button" disabled style="color:var(--muted)">Aucun résultat</button>';
+}
+[['searchInputDesktop','searchResultsDesktop'],['searchInputMobile','searchResultsMobile']].forEach(function(pair){
+  var input=$('#'+pair[0]),results=$('#'+pair[1]);
+  if(!input||!results)return;
+  input.addEventListener('input',function(){siteSearch(input.value,results)});
+  input.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){var first=results.querySelector('button[data-goto-id]');if(first)first.click()}
+    if(e.key==='Escape'){input.value='';results.innerHTML=''}
+  });
+});
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-goto-id]');
+  if(t){
+    var el=document.getElementById(t.dataset.gotoId);
+    if(el){
+      if(t.dataset.openFaq&&'open' in el)el.open=true;
+      el.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
+    }
+    $$('.search-input').forEach(function(i){i.value=''});
+    $$('.search-results').forEach(function(r){r.innerHTML=''});
+    menu.classList.remove('open');menuBtn.setAttribute('aria-expanded','false');
+    return;
+  }
+  if(!e.target.closest('.nav-search')){$$('.search-results').forEach(function(r){r.innerHTML=''})}
+});
+
+/* ---------- Animation du hero (une seule séquence) ---------- */
+(function(){
+  var marks=$$('.d-doc mark'),notes=$$('.d-notes .note');
+  function show(i){if(marks[i])marks[i].classList.add('on');if(notes[i])notes[i].classList.add('on')}
+  if(reduce){marks.forEach(function(_,i){show(i)});return}
+  marks.forEach(function(_,i){setTimeout(function(){show(i)},700+i*950)});
+})();
+
+/* ---------- Connexion de démonstration ---------- */
+var dlg=$('#auth'),mode='login';
+function setMode(m){
+  mode=m;
+  $('#loginTab').setAttribute('aria-selected',m==='login');
+  $('#signupTab').setAttribute('aria-selected',m==='signup');
+  $('#nameFields').hidden=m!=='signup';
+  $('#confirmWrap').hidden=m!=='signup';
+  $('#submitBtn').textContent=m==='signup'?'Créer mon compte':'Se connecter';
+  $('#authErr').hidden=true;
+}
+function openAuth(m){setMode(m);if(dlg.showModal){dlg.showModal()}else{dlg.setAttribute('open','')}}
+function closeAuth(){if(dlg.close){dlg.close()}else{dlg.removeAttribute('open')}}
+$$('[data-auth]').forEach(function(b){b.addEventListener('click',function(){openAuth(b.dataset.auth)})});
+$$('[data-mode]').forEach(function(b){b.addEventListener('click',function(){setMode(b.dataset.mode)})});
+$('[data-close]').addEventListener('click',closeAuth);
+dlg.addEventListener('click',function(e){if(e.target===dlg)closeAuth()});
+$('#authForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  var f=e.target,err=$('#authErr');
+  if(!f.email.value.trim()||!f.pw.value){err.textContent='Renseignez une adresse email et un mot de passe. Toute valeur convient pour la démonstration.';err.hidden=false;return}
+  if(mode==='signup'&&f.pw.value!==f.pw2.value){err.textContent='Les deux mots de passe ne correspondent pas.';err.hidden=false;return}
+  f.reset();closeAuth();goDemo();
+  toast(mode==='signup'?'Compte de démonstration créé. Aucune donnée n\u2019a été enregistrée.':'Connexion de démonstration : vous êtes dans le cabinet fictif Dupont & Associés.');
+});
+
+/* ---------- Application de démonstration ---------- */
+var MONTHS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+var DAYS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+function fr(iso){var p=iso.split('-'),d=new Date(+p[0],+p[1]-1,+p[2]);return DAYS[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear()}
+
+var ECH=[
+  {d:'2026-09-21',t:'Dépôt des conclusions en réplique',dos:'Marchand c/ SCI Les Tilleuls',src:'Calendrier de mise en état'},
+  {d:'2026-09-21',t:'Réponse à la mise en demeure',dos:'Nova Services c/ Horizon Industries',src:'Email du 17 septembre'},
+  {d:'2026-09-21',t:'Rendez-vous client, 16 h 30',dos:'Succession Lefèvre',src:'Agenda'},
+  {d:'2026-09-23',t:'Audience de mise en état',dos:'Marchand c/ SCI Les Tilleuls',src:'Avis du greffe'},
+  {d:'2026-09-25',t:'Communication des pièces',dos:'Succession Lefèvre',src:'Email du 14 septembre'},
+  {d:'2027-06-30',t:'Dénonciation de la reconduction tacite',dos:'Nova Services c/ Horizon Industries',src:'Contrat, art. 12',pending:true}
+];
+var agenda=false;
+
+var CLAUSES=[
+  {id:'a4',h:'Article 4 : Prix',p:'Le prix annuel de la maintenance est fixé à 48\u202f000 € HT, payable par trimestre.'},
+  {id:'a9',h:'Article 9 : Retard d\u2019intervention',p:'En cas de retard d\u2019intervention, le Prestataire verse au Client <mark data-f="a">une pénalité égale à 5 % du prix annuel par jour de retard, sans plafond</mark><span class="k" aria-hidden="true">a</span>.'},
+  {id:'a11',h:'Article 11 : Prise d\u2019effet',p:'Le contrat prend effet le 1er janvier 2025 pour une durée initiale de trois ans.'},
+  {id:'a12',h:'Article 12 : Reconduction',p:'À l\u2019issue de la durée initiale, le contrat est <mark data-f="b">reconduit tacitement pour des périodes successives de trois ans</mark><span class="k" aria-hidden="true">b</span>, sauf dénonciation notifiée six mois avant le terme.'},
+  {id:'a14',h:'Article 14 : Résiliation',p:'Le Client peut <mark data-f="c">résilier le contrat à tout moment, sans préavis ni indemnité</mark><span class="k" aria-hidden="true">c</span>.'}
+];
+var FINDINGS=[
+  {k:'a',lvl:'high',lab:'Risque élevé',t:'Pénalité de retard sans plafond',art:'a9',artLab:'l\u2019article 9',
+   x:'5 % du prix annuel par jour, soit 2\u202f400 € par jour. Le prix annuel (48\u202f000 €) est atteint au bout de 20 jours de retard.',
+   b:'Le juge peut modérer une pénalité manifestement excessive : article 1231-5 du Code civil.',
+   a:'Demander un plafond chiffré et un délai de grâce.'},
+  {k:'b',lvl:'watch',lab:'À surveiller',t:'Reconduction tacite de trois ans',art:'a12',artLab:'l\u2019article 12',
+   x:'Le terme initial est le 31 décembre 2027. Sans dénonciation six mois avant, le contrat repart pour trois ans.',
+   b:'Date de dénonciation calculée : 30 juin 2027 (calcul à vérifier sur les termes du contrat).',
+   a:'Ajouter la date à l\u2019agenda.',agenda:true},
+  {k:'c',lvl:'neg',lab:'À négocier',t:'Résiliation sans préavis réservée au Client',art:'a14',artLab:'l\u2019article 14',
+   x:'Le Client peut résilier à tout moment, sans préavis ni indemnité. Le Prestataire n\u2019a aucune faculté équivalente.',
+   b:'Déséquilibre significatif : article 1171 du Code civil (si le contrat est d\u2019adhésion) et article L. 442-1, I, 2° du Code de commerce.',
+   a:'Demander la réciprocité, ou un préavis.'}
+];
+var DOCS=[
+  ['Contrat de maintenance Horizon-Nova.pdf','Nova Services c/ Horizon Industries','Contrat',true],
+  ['Assignation SCI Les Tilleuls.pdf','Marchand c/ SCI Les Tilleuls','Acte'],
+  ['Devis n° 2026-031 signé.pdf','Marchand c/ SCI Les Tilleuls','Pièce'],
+  ['Mise en demeure Horizon.pdf','Nova Services c/ Horizon Industries','Courrier'],
+  ['Conclusions adverses.docx','Marchand c/ SCI Les Tilleuls','Écritures'],
+  ['Relevé de compte 2025.xlsx','Succession Lefèvre','Tableur'],
+  ['Acte de notoriété.pdf','Succession Lefèvre','Acte'],
+  ['Photos du local.jpg','Marchand c/ SCI Les Tilleuls','Image']
+];
+
+/* Mes dossiers (données fictives) */
+var DOSSIERS=[
+  {id:'marchand',nom:'Marchand c/ SCI Les Tilleuls',nature:'Contentieux locatif',statut:'En cours',maj:'21 sept. 2026'},
+  {id:'nova',nom:'Nova Services c/ Horizon Industries',nature:'Contrat commercial',statut:'En cours',maj:'19 sept. 2026'},
+  {id:'lefevre',nom:'Succession Lefèvre',nature:'Droit des successions',statut:'En cours',maj:'18 sept. 2026'},
+  {id:'solaris',nom:'Dupont c/ Assurance Solaris',nature:'Dommage corporel',statut:'En cours',maj:'15 sept. 2026'},
+  {id:'meunier',nom:'SARL Meunier — recouvrement de créance',nature:'Recouvrement de créance',statut:'Clôturé',maj:'2 sept. 2026'},
+  {id:'ba',nom:'Ba c/ Préfecture du Rhône',nature:'Droit des étrangers',statut:'En cours',maj:'12 sept. 2026'}
+];
+
+/* Recherche juridique — textes et décisions réels, vérifiés via Légifrance */
+var JURIS={
+  penalite:{label:'Pénalité manifestement excessive',items:[
+    {type:'texte',titre:'Article 1231-5 du Code civil',meta:'En vigueur depuis le 1er octobre 2016',
+     extrait:'Le juge peut, même d\u2019office, modérer ou augmenter la pénalité ainsi convenue si elle est manifestement excessive ou dérisoire.',
+     href:'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000032010131'},
+    {type:'juris',titre:'Cour de cassation, 2e civ., 18 décembre 2025, n° 23-23.751',meta:'Cassation partielle',
+     extrait:'Une clause imposant, en cas de résiliation anticipée, le paiement de l\u2019intégralité des sommes dues jusqu\u2019au terme du contrat est une clause pénale, que le juge peut réviser si elle est manifestement excessive — et non une simple clause de dédit, insusceptible de révision.',
+     href:'https://www.legifrance.gouv.fr/juri/id/JURITEXT000053135475'}
+  ]},
+  reconduction:{label:'Reconduction tacite',items:[
+    {type:'juris',titre:'Cour de cassation, ch. commerciale, 25 juin 2025, n° 24-12.074',meta:'Rejet',
+     extrait:'Faute de résiliation notifiée avant la date prévue par les conditions générales, le contrat se renouvelle par tacite reconduction : le client reste tenu des obligations du contrat ainsi reconduit, y compris s\u2019il a entretemps entamé des démarches pour changer de prestataire.',
+     href:'https://www.legifrance.gouv.fr/juri/id/JURITEXT000051856514'},
+    {type:'interne',titre:'Pièce n° 1 : Contrat de maintenance, art. 12',meta:'Dossier Nova Services c/ Horizon Industries',
+     extrait:'Le contrat est reconduit tacitement pour trois ans, sauf dénonciation notifiée six mois avant le terme.',goto:'a12'}
+  ]},
+  desequilibre:{label:'Clause déséquilibrée entre les parties',items:[
+    {type:'texte',titre:'Article 1171 du Code civil',meta:'En vigueur depuis le 1er octobre 2018',
+     extrait:'Dans un contrat d\u2019adhésion, toute clause non négociable, déterminée à l\u2019avance par l\u2019une des parties, qui crée un déséquilibre significatif entre les droits et obligations des parties est réputée non écrite.',
+     href:'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000036829836'},
+    {type:'texte',titre:'Article L. 442-1 du Code de commerce',meta:'En vigueur depuis le 20 août 2026',
+     extrait:'Engage la responsabilité de son auteur le fait de soumettre l\u2019autre partie à des obligations créant un déséquilibre significatif dans les droits et obligations des parties.',
+     href:'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000054716237'}
+  ]}
+};
+
+/* Tableau de bord */
+function renderDash(){
+  var today=ECH.filter(function(e){return e.d==='2026-09-21'});
+  $('#view-dash').innerHTML=
+  '<div class="view-head"><div><h3>Bonjour, Maître Dupont</h3><p class="muted">Lundi 21 septembre 2026</p></div><span class="avatar" aria-hidden="true">MD</span></div>'+
+  '<div class="stats">'+
+    '<button class="stat" data-view="ech"><span class="stat-n">3</span>échéances aujourd\u2019hui</button>'+
+    '<button class="stat" data-view="docs"><span class="stat-n">8</span>documents à analyser</button>'+
+    '<button class="stat" data-view="dossiers"><span class="stat-n">24</span>dossiers actifs</button>'+
+    '<button class="stat" data-view="emails"><span class="stat-n">5</span>emails à traiter</button>'+
+  '</div>'+
+  '<div class="two">'+
+    '<div><h4 class="h4">Aujourd\u2019hui</h4><ul class="rows">'+today.map(function(e){return '<li>'+e.t+'<small>'+e.dos+'</small></li>'}).join('')+'</ul></div>'+
+    '<div><h4 class="h4">Emails à traiter</h4><ul class="rows">'+
+      '<li>Mme Marchand : devis n° 2026-031<small>Accord détecté</small></li>'+
+      '<li>Horizon Industries : mise en demeure<small><span class="tag">Délai détecté : 21 septembre</span></small></li>'+
+      '<li>Greffe : avis de fixation<small><span class="tag">Échéance ajoutée à l\u2019agenda</span></small></li>'+
+    '</ul></div>'+
+  '</div>'+
+  '<div class="ask"><p><b>Que souhaitez-vous faire ?</b> Analysez un contrat, recherchez une information ou posez une question sur un dossier.</p>'+
+    '<div class="chips"><button class="chip" data-ask="risques">Clauses à risque du contrat Horizon</button><button class="chip" data-ask="email">Retrouver l\u2019accord de Mme Marchand</button><button class="chip" data-ask="ech">Mes échéances de la semaine</button></div></div>';
+}
+
+/* Échéances */
+function renderEch(){
+  var list=ECH.filter(function(e){return !e.pending||agenda});
+  var days={};list.forEach(function(e){(days[e.d]=days[e.d]||[]).push(e)});
+  var html='<div class="view-head"><div><h3>Échéances</h3><p class="muted">Délais repérés dans vos documents et vos emails</p></div><span class="avatar" aria-hidden="true">MD</span></div>';
+  Object.keys(days).sort().forEach(function(d){
+    html+='<div class="ech-day"><h4 class="h4">'+fr(d)+'</h4><ul class="rows">'+days[d].map(function(e){
+      return '<li>'+e.t+'<small>'+e.dos+'</small><span class="src">'+e.src+'</span>'+(e.pending?' <span class="tag">Ajoutée depuis l\u2019analyse du contrat</span>':'')+'</li>';
+    }).join('')+'</ul></div>';
+  });
+  if(!agenda)html+='<p class="ech-empty">Une échéance proposée par l\u2019analyse du contrat Horizon-Nova peut être ajoutée depuis la section Documents.</p>';
+  $('#view-ech').innerHTML=html;
+}
+
+/* Mes dossiers */
+function statusBadge(s){return '<span class="dstatus '+(s==='Clôturé'?'dstatus-closed':'dstatus-active')+'">'+s+'</span>'}
+function renderDossiers(){
+  $('#dossierRows').innerHTML=DOSSIERS.map(function(d){
+    return '<tr><td>'+d.nom+'</td><td>'+d.nature+'</td><td>'+statusBadge(d.statut)+'</td><td><button class="btn-line" data-dossier="'+d.id+'">Ouvrir</button></td></tr>';
+  }).join('');
+}
+function renderDossierDetail(id){
+  var d=DOSSIERS.filter(function(x){return x.id===id})[0];if(!d)return;
+  var docs=DOCS.filter(function(r){return r[1]===d.nom});
+  var ech=ECH.filter(function(e){return e.dos===d.nom&&(!e.pending||agenda)});
+  var html='<div class="view-head"><div><h3>'+d.nom+'</h3><p class="muted">'+d.nature+' · '+statusBadge(d.statut)+' · dernière activité le '+d.maj+'</p></div></div>';
+  html+='<div class="two">';
+  html+='<div><h4 class="h4">Documents ('+docs.length+')</h4>'+
+    (docs.length?'<ul class="rows">'+docs.map(function(r){return '<li>'+r[0]+'<small>'+r[2]+'</small></li>'}).join('')+'</ul>':'<p class="muted" style="font-size:13.5px">Aucun document associé dans cette démonstration.</p>')+
+    '<button class="btn-line" data-view="docs" style="margin-top:12px">Voir les documents →</button></div>';
+  html+='<div><h4 class="h4">Échéances ('+ech.length+')</h4>'+
+    (ech.length?'<ul class="rows">'+ech.map(function(e){return '<li>'+e.t+'<small>'+fr(e.d)+'</small></li>'}).join('')+'</ul>':'<p class="muted" style="font-size:13.5px">Aucune échéance à venir dans cette démonstration.</p>')+
+    '<button class="btn-line" data-view="ech" style="margin-top:12px">Voir les échéances →</button></div>';
+  html+='</div><button class="btn btn-primary" data-view="ask" style="margin-top:26px">Poser une question sur ce dossier</button>';
+  $('#dossierDetailBody').innerHTML=html;
+}
+function openDossier(id){$('#dossierList').hidden=true;$('#dossierDetail').hidden=false;renderDossierDetail(id)}
+
+/* Recherche juridique */
+function jurisCard(it){
+  var tag=it.type==='texte'?'Texte de loi':(it.type==='juris'?'Jurisprudence':'Dans vos dossiers');
+  var link=it.href
+    ?'<a class="src-ext" href="'+it.href+'" target="_blank" rel="noopener">Consulter sur Légifrance ↗</a>'
+    :'<button class="src" data-goto="'+it.goto+'">Voir dans le contrat</button>';
+  return '<article class="jcard"><span class="jtag jtag-'+it.type+'">'+tag+'</span><h5>'+it.titre+'</h5>'+
+    (it.meta?'<p class="jmeta">'+it.meta+'</p>':'')+'<p>'+it.extrait+'</p>'+link+'</article>';
+}
+function renderJuris(key){
+  var d=JURIS[key];if(!d)return;
+  var html='<div class="jhead"><span class="badge badge-real">Contenu réel, vérifié</span> <span class="muted" style="font-size:13.5px">'+d.items.length+' résultat(s) pour « '+d.label+' »</span></div>';
+  html+=d.items.map(jurisCard).join('');
+  html+='<p class="muted" style="font-size:12.5px;margin-top:6px">Toujours vérifier la version en vigueur avant de citer une pièce.</p>';
+  $('#jurisResults').innerHTML=html;
+}
+function pickJuris(q){
+  q=q.toLowerCase();
+  if(/p[ée]nalit|excessi|d[ée]risoire/.test(q))return 'penalite';
+  if(/reconduct|tacite|renouvel/.test(q))return 'reconduction';
+  if(/d[ée]s[ée]quilibr|abusiv|r[ée]silia|adh[ée]sion/.test(q))return 'desequilibre';
+  return null;
+}
+
+/* ============ Rédaction ============ */
+function renderRedaction(){
+  var opts=DOSSIERS.map(function(d){return '<option value="'+d.id+'">'+d.nom+'</option>'}).join('');
+  var html='<div class="view-head"><div><h3>Rédaction</h3><p class="muted">Un premier jet, dans la mise en forme exacte du cabinet — à relire avant dépôt.</p></div><span class="avatar" aria-hidden="true">MD</span></div>';
+  html+='<div class="red-form"><select id="redDossier">'+opts+'</select>'+
+    '<select id="redType"><option value="conclusions">Conclusions</option><option value="assignation">Assignation</option><option value="courrier">Courrier de mise en demeure</option></select>'+
+    '<button class="btn btn-primary" id="redGenerer" type="button">Générer</button></div>';
+  html+='<div id="redOut"><p class="muted">Choisissez un dossier et un type d\u2019acte, puis cliquez sur Générer.</p></div>';
+  $('#view-redaction').innerHTML=html;
+  $('#redGenerer').addEventListener('click',function(){
+    $('#redOut').innerHTML='<p class="loading" role="status">Attesto rédige…</p>';
+    setTimeout(function(){renderActe($('#redDossier').value,$('#redType').value)},reduce?0:900);
+  });
+}
+function partieAdverse(d){
+  var parts=d.nom.split(/ c\/ | — /);
+  return {demandeur:parts[0],defendeur:parts[1]||'la partie adverse'};
+}
+function renderActe(dossierId,type){
+  var d=DOSSIERS.filter(function(x){return x.id===dossierId})[0]||DOSSIERS[0];
+  var p=partieAdverse(d);
+  var titres={conclusions:'CONCLUSIONS EN DEMANDE',assignation:'ASSIGNATION',courrier:'MISE EN DEMEURE'};
+  var html='<div class="acte-shell">';
+  html+='<div class="acte-entete"><div class="l1">CABINET DUPONT &amp; ASSOCIÉS</div><div class="l2">Maître A. Dupont, Avocat au Barreau de Lyon</div><div class="l3">Toque 1234</div>12 rue de la République — 69002 Lyon · Tél. 04 72 00 00 00</div>';
+  html+='<div class="acte-ident">POUR : <b>'+p.demandeur+'</b><br>Ayant pour avocat : Maître A. Dupont<br><br>CONTRE : <b>'+p.defendeur+'</b></div>';
+  html+='<div class="acte-titre">'+titres[type]+'<br><span style="font-weight:400;font-size:12.5px;text-transform:none">Dossier : '+d.nom+' — '+d.nature+'</span></div>';
+  html+='<div class="acte-pagebreak">— saut de page —</div>';
+  html+='<div class="acte-body">';
+  html+='<div class="acte-section">I. FAITS ET PROCÉDURE</div>';
+  html+='<div class="acte-sub">Sur la relation contractuelle</div>';
+  html+='<p>Par acte en date du 4 janvier 2025, les parties se sont liées dans le cadre d\u2019un rapport relevant du '+d.nature.toLowerCase()+'. <span class="acte-piece">Pièce n° 1 : contrat du 4 janvier 2025</span>. Les difficultés rencontrées depuis lors justifient la présente procédure.</p>';
+  html+='<div class="acte-section">II. DISCUSSION</div>';
+  html+='<div class="acte-sub">Sur le bien-fondé de la demande</div>';
+  html+='<p>Il sera rappelé que :</p>';
+  html+='<p class="acte-quote">« Le juge peut, même d\u2019office, modérer ou augmenter la pénalité ainsi convenue si elle est manifestement excessive ou dérisoire. »</p>';
+  html+='<p class="acte-ref-left">Article 1231-5 du Code civil.</p>';
+  html+='<p>En l\u2019espèce, les échanges intervenus établissent la position de '+p.demandeur+'. <span class="acte-piece">Pièce n° 2 : échange de correspondances des 12 et 18 juin 2026</span>. Il en résulte que la demande est parfaitement fondée, tant en droit qu\u2019en fait.</p>';
+  html+='<div class="acte-pcm">PAR CES MOTIFS</div>';
+  html+='<p>Il est demandé qu\u2019il plaise au Tribunal de :</p><p>— Recevoir '+p.demandeur+' en ses demandes ;<br>— Les dire bien fondées ;<br>— Condamner '+p.defendeur+' aux entiers dépens.</p>';
+  html+='<p class="acte-reserves">Sous toutes réserves.</p>';
+  html+='</div></div>';
+  html+='<p class="conf" style="max-width:640px;margin:16px auto 0">Premier jet généré pour la démonstration à partir des pièces du dossier. À relire, compléter et vérifier avant tout dépôt — Attesto ne garantit ni l\u2019exhaustivité ni l\u2019exactitude juridique d\u2019un premier jet.</p>';
+  html+='<div style="max-width:640px;margin:14px auto 0;text-align:center"><button class="btn-line" id="redCopy">Copier le texte</button> <button class="btn-line" id="redDocx">Télécharger en .docx</button></div>';
+  $('#redOut').innerHTML=html;
+  $('#redDocx').addEventListener('click',function(){toast('Dans Attesto, ce document se télécharge au format .docx, dans le style exact de votre cabinet.')});
+  $('#redCopy').addEventListener('click',function(){toast('Texte copié.')});
+}
+
+/* ============ Emails ============ */
+var EMAILS=[
+  {id:1,from:'Mme Claire Marchand',subj:'Devis n° 2026-031 — validation',when:'12 mars, 10:42',dossier:'Marchand c/ SCI Les Tilleuls',detect:'Accord détecté',lvl:'watch',
+   body:'Bonjour Maître,\n\nJe valide le devis n° 2026-031 pour 1 850 € HT. Merci de lancer les démarches.\n\nBien cordialement,\nC. Marchand'},
+  {id:2,from:'Horizon Industries — Service juridique',subj:'Mise en demeure — contrat de maintenance',when:'17 sept., 09:15',dossier:'Nova Services c/ Horizon Industries',detect:'Délai détecté : 21 septembre',lvl:'high',
+   body:'Maître,\n\nNous mettons votre client en demeure de régulariser sous 8 jours à compter de la présente, soit avant le 21 septembre 2026.\n\nCordialement,\nService juridique — Horizon Industries'},
+  {id:3,from:'Tribunal judiciaire de Lyon — Greffe',subj:'Avis de fixation d\u2019audience',when:'15 sept., 14:03',dossier:'Marchand c/ SCI Les Tilleuls',detect:'Échéance ajoutée à l\u2019agenda',lvl:'watch',
+   body:'Madame, Monsieur,\n\nL\u2019affaire est fixée à l\u2019audience de mise en état du mercredi 23 septembre 2026.\n\nLe greffe.'},
+  {id:4,from:'Office notarial Bernard & Roux',subj:'Succession Lefèvre — pièces transmises',when:'14 sept., 16:20',dossier:'Succession Lefèvre',detect:'Pièce jointe détectée',lvl:'low',
+   body:'Maître,\n\nVeuillez trouver ci-joint l\u2019acte de notoriété établi dans le cadre de la succession Lefèvre.\n\nCordialement,\nOffice notarial Bernard & Roux'},
+  {id:5,from:'SARL Meunier',subj:'Relance — facture en attente',when:'8 sept., 11:05',dossier:'SARL Meunier — recouvrement de créance',detect:'Aucune action requise',lvl:'low',
+   body:'Bonjour,\n\nNous revenons vers vous concernant le solde de la facture, réglée depuis lors par virement.\n\nCordialement.'}
+];
+function renderEmails(){
+  var html='<div id="emailList"><div class="view-head"><div><h3>Emails</h3><p class="muted">'+EMAILS.length+' messages, triés par pertinence</p></div><span class="avatar" aria-hidden="true">MD</span></div>';
+  html+=EMAILS.map(function(e){
+    return '<div class="email-row" data-email="'+e.id+'"><div><div class="from">'+e.from+'</div><div class="subj">'+e.subj+'</div><span class="tag email-detect">'+e.detect+'</span></div><div class="when">'+e.when+'</div></div>';
+  }).join('');
+  html+='</div><div id="emailDetail" hidden></div>';
+  $('#view-emails').innerHTML=html;
+}
+function openEmail(id){
+  var e=EMAILS.filter(function(x){return x.id==id})[0];if(!e)return;
+  $('#emailList').hidden=true;var d=$('#emailDetail');d.hidden=false;
+  var html='<button class="btn-line back" id="backEmails">Retour aux emails</button>';
+  html+='<div class="view-head" style="margin-top:16px"><div><h3>'+e.subj+'</h3><p class="muted">'+e.from+' · '+e.when+' · dossier '+e.dossier+'</p></div></div>';
+  html+='<span class="tag">'+e.detect+'</span>';
+  html+='<div class="email-body">'+e.body+'</div>';
+  html+='<div class="acts"><button class="btn btn-primary" id="emailReply">Répondre</button> <button class="btn-line" id="emailFile">Classer dans le dossier</button>'+(/Délai|Échéance/.test(e.detect)?' <button class="btn-line" id="emailAgenda">+ Ajouter à l\u2019agenda</button>':'')+'</div>';
+  d.innerHTML=html;
+  $('#emailReply').addEventListener('click',function(){toast('Brouillon de réponse préparé par Attesto — à relire avant envoi.')});
+  $('#emailFile').addEventListener('click',function(){toast('Classé dans « '+e.dossier+' ».')});
+  var ag=$('#emailAgenda');if(ag)ag.addEventListener('click',function(){toast('Échéance ajoutée à l\u2019agenda.')});
+}
+
+/* ============ Statistiques ============ */
+function renderStats(){
+  var temps=[['Contentieux locatif',3.5],['Contrat commercial',6],['Droit des successions',2],['Dommage corporel',9.5],['Recouvrement de créance',1],['Droit des étrangers',4]];
+  var maxT=Math.max.apply(null,temps.map(function(t){return t[1]}));
+  var html='<div class="view-head"><div><h3>Statistiques</h3><p class="muted">Activité du cabinet, mise à jour en continu</p></div><span class="avatar" aria-hidden="true">MD</span></div>';
+  html+='<div class="stat-grid">'+
+    '<div class="stat"><span class="stat-n">'+DOSSIERS.length+'</span>dossiers</div>'+
+    '<div class="stat"><span class="stat-n">14</span>documents analysés ce mois</div>'+
+    '<div class="stat"><span class="stat-n">92%</span>échéances à jour</div>'+
+    '<div class="stat"><span class="stat-n">≈ 6h</span>estimées économisées ce mois</div>'+
+  '</div>';
+  html+='<h4 class="h4" style="margin-bottom:14px">Temps consacré ce mois, par nature de dossier</h4><div class="bars">';
+  html+=temps.map(function(t){
+    var pct=Math.round(t[1]/maxT*100);
+    return '<div class="bar-row"><span>'+t[0]+'</span><span class="bar-track"><span class="bar-fill" style="width:'+pct+'%"></span></span><span class="muted">'+t[1]+' h</span></div>';
+  }).join('')+'</div>';
+  html+='<h4 class="h4" style="margin:28px 0 14px">Activité récente</h4><ul class="rows">'+
+    '<li>Analyse du contrat Horizon-Nova<small>Aujourd\u2019hui</small></li>'+
+    '<li>Échéance ajoutée — audience de mise en état<small>Hier</small></li>'+
+    '<li>Nouveau document — Succession Lefèvre<small>Il y a 2 jours</small></li>'+
+  '</ul>';
+  $('#view-stats').innerHTML=html;
+}
+
+/* ============ Paramètres ============ */
+function renderParams(){
+  var html='<div class="view-head"><div><h3>Paramètres</h3><p class="muted">Cabinet, équipe et abonnement</p></div><span class="avatar" aria-hidden="true">MD</span></div>';
+  html+='<div class="settings-block"><h4 class="h4">Cabinet</h4><div class="kv">'+
+    '<div><dt>Nom</dt><dd>Cabinet Dupont &amp; Associés</dd></div>'+
+    '<div><dt>Adresse</dt><dd>12 rue de la République, 69002 Lyon</dd></div>'+
+    '<div><dt>Email</dt><dd>contact@dupont-avocats.fr</dd></div></div></div>';
+  html+='<div class="settings-block"><h4 class="h4">Équipe</h4><ul class="rows">'+
+    '<li>Maître A. Dupont<small>Titulaire</small></li></ul>'+
+    '<button class="btn-line" id="inviteBtn" style="margin-top:12px">+ Inviter un collaborateur</button></div>';
+  html+='<div class="settings-block"><h4 class="h4">Abonnement</h4><div class="kv">'+
+    '<div><dt>Formule</dt><dd>Attesto Cabinet — 299 € HT/mois</dd></div>'+
+    '<div><dt>Prochaine facturation</dt><dd>1er novembre 2026</dd></div></div>'+
+    '<button class="btn-line" id="manageBilling" style="margin-top:12px">Gérer l\u2019abonnement</button></div>';
+  html+='<div class="settings-block"><h4 class="h4">Notifications</h4>'+
+    '<div class="toggle-row">Échéances par email<button class="tgl on" data-tgl></button></div>'+
+    '<div class="toggle-row">Résumé hebdomadaire<button class="tgl" data-tgl></button></div>'+
+    '<div class="toggle-row">Alerte nouveau document<button class="tgl on" data-tgl></button></div></div>';
+  $('#view-params').innerHTML=html;
+  $('#inviteBtn').addEventListener('click',function(){toast('Invitation envoyée (démonstration).')});
+  $('#manageBilling').addEventListener('click',function(){toast('Redirection vers la gestion de l\u2019abonnement.')});
+}
+
+/* ============ CARPA (aide-mémoire, données de démonstration) ============ */
+var CARPA_DEMO=[
+  {dossier:'Dupont c/ Assurance Solaris',solde:0,mouvements:[
+    {type:'Réception pour le client',montant:50000,date:'20 sept. 2026',prov:'Assurance Solaris'},
+    {type:'Prélèvement d\u2019honoraires',montant:5000,date:'22 sept. 2026',prov:'Cabinet'},
+    {type:'Reversement au client',montant:45000,date:'23 sept. 2026',prov:'Client'}
+  ]},
+  {dossier:'Ba c/ Préfecture du Rhône',solde:12000,mouvements:[
+    {type:'Réception pour le client',montant:12000,date:'25 sept. 2026',prov:'FGTI'}
+  ]}
+];
+function renderCarpaDemo(){
+  var total=CARPA_DEMO.reduce(function(a,d){return a+d.solde},0);
+  var html='<div class="view-head"><div><h3>CARPA</h3><p class="muted">Récapitulatif par dossier — reste dû aux clients</p></div><span class="avatar" aria-hidden="true">MD</span></div>';
+  html+='<p class="fine" style="margin:-8px 0 20px">Aide-mémoire, pas un relevé bancaire : à recouper avec votre compte CARPA réel. Aucun fonds n\u2019est déplacé par Attesto.</p>';
+  html+='<p style="font-weight:650;margin-bottom:16px">Total encore dû, tous dossiers confondus : <span style="color:'+(total>0?'var(--seal)':'var(--steel)')+'">'+total.toLocaleString('fr-FR')+' €</span></p>';
+  html+=CARPA_DEMO.map(function(d){
+    return '<div style="margin-bottom:22px"><p style="font-weight:650">'+d.dossier+' — <span style="color:'+(d.solde>0?'var(--seal)':'var(--steel)')+'">'+d.solde.toLocaleString('fr-FR')+' €</span></p>'+
+      '<ul class="rows">'+d.mouvements.map(function(m){return '<li>'+m.type+' — '+m.montant.toLocaleString('fr-FR')+' €<small>'+m.date+' · '+m.prov+'</small></li>'}).join('')+'</ul></div>';
+  }).join('');
+  $('#view-carpa').innerHTML=html;
+}
+
+/* Documents */
+function renderDocs(){
+  $('#docRows').innerHTML=DOCS.map(function(d,i){
+    return '<tr><td>'+d[0]+'</td><td>'+d[1]+'</td><td>'+d[2]+'</td><td><span class="st">À analyser</span></td><td><button class="btn-line" data-analyse="'+i+'">Analyser</button></td></tr>';
+  }).join('');
+}
+function renderAnalysis(){
+  $('#contract').innerHTML='<h4>Contrat de maintenance</h4><p>Entre Horizon Industries SAS (le «\u202fClient\u202f») et Nova Services SARL (le «\u202fPrestataire\u202f»).</p>'+
+    CLAUSES.map(function(c){return '<section id="cl-'+c.id+'"><h5>'+c.h+'</h5><p>'+c.p+'</p></section>'}).join('');
+  $('#findings').innerHTML=FINDINGS.map(function(f){
+    return '<article class="finding"><header><span class="k" aria-hidden="true" style="margin:0">'+f.k+'</span><span class="lvl lvl-'+f.lvl+'">'+f.lab+'</span><h5>'+f.t+'</h5></header>'+
+      '<p>'+f.x+'</p><p><b>Fondement.</b> '+f.b+'</p><p><b>À faire.</b> '+f.a+'</p>'+
+      '<div class="acts"><button class="btn-line" data-goto="'+f.art+'">Voir dans '+f.artLab+'</button>'+
+      (f.agenda?'<button class="btn-line" id="agendaBtn" aria-pressed="false">Ajouter à l\u2019agenda</button>':'')+'</div></article>';
+  }).join('');
+}
+var analysed=false;
+function showAnalysis(skip){
+  $('#docList').hidden=true;$('#docAn').hidden=false;
+  if(analysed||skip||reduce){analysed=true;$('#anLoad').hidden=true;$('#anBody').hidden=false;return}
+  $('#anLoad').hidden=false;$('#anBody').hidden=true;
+  setTimeout(function(){analysed=true;$('#anLoad').hidden=true;$('#anBody').hidden=false},1100);
+}
+function gotoClause(id){
+  var box=$('#contract'),sec=$('#cl-'+id);if(!box||!sec)return;
+  box.scrollTo({top:Math.max(0,sec.offsetTop-14),behavior:reduce?'auto':'smooth'});
+  var m=$('mark',sec);
+  if(m){m.classList.remove('flash');void m.offsetWidth;m.classList.add('flash');setTimeout(function(){m.classList.remove('flash')},1800)}
+}
+function openDoc(clause){setView('docs');showAnalysis(true);if(clause)setTimeout(function(){gotoClause(clause)},60)}
+function toggleAgenda(){
+  agenda=!agenda;
+  var b=$('#agendaBtn');b.setAttribute('aria-pressed',agenda);b.textContent=agenda?'✓ Ajoutée à l\u2019agenda':'Ajouter à l\u2019agenda';
+  b.classList.remove('pulse');void b.offsetWidth;b.classList.add('pulse');
+  renderEch();
+  toast(agenda?'Échéance ajoutée : dénonciation avant le 30 juin 2027. Elle apparaît dans Échéances.':'Échéance retirée de l\u2019agenda.');
+}
+function copyNote(){
+  var txt='Analyse du contrat de maintenance Horizon Industries / Nova Services (données fictives)\nPour le compte de Nova Services, Prestataire\n\n'+
+    FINDINGS.map(function(f,i){return (i+1)+'. '+f.t+' ('+f.lab+', '+f.artLab.replace('l\u2019a','A')+')\n'+f.x+'\nFondement : '+f.b+'\nÀ faire : '+f.a}).join('\n\n')+
+    '\n\nÀ vérifier dans le contrat et à la source avant utilisation.';
+  function done(){
+    toast('Note d\u2019analyse copiée.');
+    var b=$('#copyNote');if(!b)return;var old=b.textContent;
+    b.textContent='✓ Copié';b.classList.remove('pulse');void b.offsetWidth;b.classList.add('pulse');
+    setTimeout(function(){b.textContent=old},1700);
+  }
+  function fallback(){var t=document.createElement('textarea');t.value=txt;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();try{document.execCommand('copy');done()}catch(e){toast('Copie impossible dans ce navigateur.')}t.remove()}
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done,fallback)}else{fallback()}
+}
+
+/* Assistant */
+var SRC=function(id,lab){return '<button class="src" data-goto="'+id+'">'+lab+'</button>'};
+function ansDossier(nom){
+  var d=DOSSIERS.filter(function(x){return x.nom===nom})[0];
+  var docs=DOCS.filter(function(r){return r[1]===nom});
+  var ech=ECH.filter(function(e){return e.dos===nom&&!e.pending});
+  var natureLine=nom.indexOf('—')>-1?d.statut.toLowerCase():(d.nature.toLowerCase()+', '+d.statut.toLowerCase());
+  var html='<p><b>'+nom+'</b> — '+natureLine+'.</p>';
+  html+=docs.length?('<p>'+docs.length+' document(s) au dossier : '+docs.map(function(r){return r[0]}).join(', ')+'.</p>'):'<p>Aucun document importé sur ce dossier pour l\u2019instant.</p>';
+  html+=ech.length?('<ul>'+ech.map(function(e){return '<li>'+e.t+' — '+fr(e.d)+' <span class="src">'+e.src+'</span></li>'}).join('')+'</ul>'):'<p>Aucune échéance à venir sur ce dossier.</p>';
+  return html;
+}
+function ansCarpaQ(){
+  var lignes=CARPA_DEMO.map(function(d){
+    return '<li>'+d.dossier+' — '+(d.solde>0?'<b style="color:var(--seal)">'+d.solde.toLocaleString('fr-FR')+' € encore à reverser</b>':'soldé (0 €)')+'</li>';
+  }).join('');
+  return '<p>Situation CARPA, tous dossiers confondus :</p><ul>'+lignes+'</ul><p>Vérifiez toujours ces montants avec votre compte CARPA réel avant tout reversement.</p>';
+}
+function ansTodoDocs(){
+  var reste=DOCS.filter(function(r,i){return i!==0});
+  return '<p>'+reste.length+' document(s) sur '+DOCS.length+' restent à analyser :</p><ul>'+
+    reste.map(function(r){return '<li>'+r[0]+' <span class="src">'+r[1]+'</span></li>'}).join('')+
+    '</ul><p>Seul le contrat de maintenance Horizon-Nova a déjà été analysé.</p>';
+}
+var ANSWERS={
+  risques:{q:'Quelles sont les clauses à risque du contrat Horizon ?',html:
+    '<p>Trois points méritent votre attention pour Nova Services, le Prestataire.</p><ol>'+
+    '<li><b>Pénalité de retard sans plafond.</b> 5 % du prix annuel par jour, soit 2\u202f400 € par jour. '+SRC('a9','Pièce n° 1 : Contrat de maintenance, art. 9')+'</li>'+
+    '<li><b>Reconduction tacite de trois ans.</b> Dénonciation à notifier au plus tard le 30 juin 2027 (calcul à vérifier). '+SRC('a12','Pièce n° 1 : Contrat de maintenance, art. 12')+'</li>'+
+    '<li><b>Résiliation sans préavis réservée au Client.</b> Aucune faculté équivalente pour le Prestataire. '+SRC('a14','Pièce n° 1 : Contrat de maintenance, art. 14')+'</li></ol>'+
+    '<p>Une pénalité manifestement excessive peut être modérée par le juge. <a class="src-ext" href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000032010131" target="_blank" rel="noopener">Art. 1231-5, Code civil ↗</a><a class="src-ext" href="https://www.legifrance.gouv.fr/juri/id/JURITEXT000053135475" target="_blank" rel="noopener">Cass. 2e civ., 18 déc. 2025, n° 23-23.751 ↗</a></p>'},
+  email:{q:'Retrouve l\u2019email où Mme Marchand accepte le devis',html:
+    '<p>Dans le dossier Marchand c/ SCI Les Tilleuls, Mme Marchand a accepté le devis par email le 12 mars 2026.</p>'+
+    '<blockquote>«\u202fJe valide le devis n° 2026-031 pour 1\u202f850 € HT. Merci de lancer les travaux.\u202f»</blockquote>'+
+    '<p><span class="src">Email du 12 mars 2026, 10 h 42</span> <span class="src">Pièce n° 3 : Devis n° 2026-031 signé</span></p>'+
+    '<p>Le montant de l\u2019email correspond à celui du devis signé.</p>'},
+  ech:{q:'Quelles sont mes échéances de la semaine ?',html:
+    '<p>Cinq échéances cette semaine.</p><ul>'+
+    '<li><b>Lundi 21 septembre.</b> Conclusions en réplique (Marchand c/ SCI Les Tilleuls), réponse à la mise en demeure d\u2019Horizon Industries, rendez-vous Lefèvre à 16 h 30.</li>'+
+    '<li><b>Mercredi 23 septembre.</b> Audience de mise en état (Marchand c/ SCI Les Tilleuls). <span class="src">Avis du greffe</span></li>'+
+    '<li><b>Vendredi 25 septembre.</b> Communication des pièces (Succession Lefèvre). <span class="src">Email du 14 septembre</span></li></ul>'+
+    '<p>Trois d\u2019entre elles tombent aujourd\u2019hui.</p>'},
+  marchand:{q:'Fais un point sur le dossier Marchand',html:ansDossier('Marchand c/ SCI Les Tilleuls')},
+  lefevre:{q:'Où en est la succession Lefèvre ?',html:ansDossier('Succession Lefèvre')},
+  meunier:{q:'Le dossier Meunier est-il clôturé ?',html:ansDossier('SARL Meunier — recouvrement de créance')},
+  carpa_q:{q:'Reste-t-il des fonds à reverser sur un dossier ?',html:ansCarpaQ()},
+  todo:{q:'Quels documents dois-je encore analyser ?',html:ansTodoDocs()}
+};
+var FALLBACK='<p class="who">Attesto</p><p>Cette démonstration comprend plusieurs questions sur vos dossiers, vos emails, vos échéances et vos fonds CARPA — essayez-en une ci-dessus, ou reformulez la vôtre.</p><p>Dans Attesto, vous posez votre question librement et la réponse est construite à partir de l\u2019ensemble de vos documents et emails.</p>';
+function pick(q){
+  q=q.toLowerCase();
+  if(/clause|risque|contrat|horizon|p[ée]nalit/.test(q))return 'risques';
+  if(/devis|accept/.test(q))return 'email';
+  if(/[ée]ch[ée]ance|semaine|agenda|d[ée]lai|audience/.test(q))return 'ech';
+  if(/marchand|tilleuls|locatif/.test(q))return 'marchand';
+  if(/lef[èe]vre|succession/.test(q))return 'lefevre';
+  if(/meunier|recouvrement|cl[oô]tur/.test(q))return 'meunier';
+  if(/carpa|fonds|revers/.test(q))return 'carpa_q';
+  if(/analyser|analys[ée]/.test(q))return 'todo';
+  return null;
+}
+var busy=false;
+function send(text){
+  text=(text||'').trim();if(busy||!text)return;busy=true;
+  var log=$('#chatLog');
+  var u=document.createElement('div');u.className='msg user';u.textContent=text;log.appendChild(u);
+  var a=document.createElement('div');a.className='msg bot';a.innerHTML='<span class="typing" role="status"><span class="sr-only">Attesto prépare une réponse</span><span class="tdot" aria-hidden="true"></span><span class="tdot" aria-hidden="true"></span><span class="tdot" aria-hidden="true"></span></span>';log.appendChild(a);
+  log.scrollTop=log.scrollHeight;
+  var key=pick(text);
+  setTimeout(function(){
+    a.innerHTML=key?'<p class="who">Attesto</p>'+ANSWERS[key].html:FALLBACK;
+    log.scrollTop=log.scrollHeight;busy=false;
+  },reduce?0:900);
+}
+
+/* Navigation entre sections */
+var VIEW_LABELS={dash:'Tableau de bord',dossiers:'Mes dossiers',docs:'Documents',recherche:'Recherche juridique',redaction:'Rédaction',ask:'Assistant Attesto',ech:'Échéances',carpa:'CARPA',emails:'Emails',stats:'Statistiques',params:'Paramètres'};
+function buildAppSearchIndex(){
+  var idx=[];
+  Object.keys(VIEW_LABELS).forEach(function(k){
+    idx.push({type:'Section',label:VIEW_LABELS[k],action:function(){setView(k,true)}});
+  });
+  DOSSIERS.forEach(function(d){
+    idx.push({type:'Dossier',label:d.nom,sub:d.nature,action:function(){setView('dossiers');openDossier(d.id)}});
+  });
+  DOCS.forEach(function(r,i){
+    idx.push({type:'Document',label:r[0],sub:r[1],action:function(){
+      setView('docs');
+      if(i===0){showAnalysis()}else{toast('Cette démonstration analyse un seul document : le contrat de maintenance Horizon-Nova.')}
+    }});
+  });
+  EMAILS.forEach(function(e){
+    idx.push({type:'Email',label:e.subj,sub:e.from,action:function(){setView('emails');openEmail(e.id)}});
+  });
+  ECH.forEach(function(e){
+    idx.push({type:'Échéance',label:e.t,sub:e.dos,action:function(){setView('ech')}});
+  });
+  return idx;
+}
+var APP_SEARCH_INDEX=null;
+function appSearch(query,resultsEl){
+  if(!APP_SEARCH_INDEX)APP_SEARCH_INDEX=buildAppSearchIndex();
+  query=query.trim().toLowerCase();
+  if(!query){resultsEl.innerHTML='';return}
+  var matches=APP_SEARCH_INDEX.filter(function(e){
+    return e.label.toLowerCase().indexOf(query)>-1||(e.sub&&e.sub.toLowerCase().indexOf(query)>-1)||e.type.toLowerCase().indexOf(query)>-1;
+  }).slice(0,8);
+  resultsEl.innerHTML=matches.length?matches.map(function(e,i){
+    return '<button type="button" data-appsearch-i="'+i+'"><span class="asr-type">'+e.type+'</span>'+e.label+(e.sub?' <span class="muted" style="font-size:12px">— '+e.sub+'</span>':'')+'</button>';
+  }).join(''):'<button type="button" disabled style="color:var(--muted)">Aucun résultat</button>';
+  resultsEl._matches=matches;
+}
+(function(){
+  var input=$('#appSearchInput'),results=$('#appSearchResults');
+  if(!input||!results)return;
+  input.addEventListener('input',function(){appSearch(input.value,results)});
+  input.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){var first=results.querySelector('button[data-appsearch-i]');if(first)first.click()}
+    if(e.key==='Escape'){input.value='';results.innerHTML=''}
+  });
+  results.addEventListener('click',function(e){
+    var t=e.target.closest('[data-appsearch-i]');
+    if(!t||!results._matches)return;
+    var match=results._matches[+t.dataset.appsearchI];
+    if(match){match.action();input.value='';results.innerHTML=''}
+  });
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.app-search-bar'))results.innerHTML='';
+  });
+})();
+
+var VIEWS=['dash','dossiers','docs','recherche','redaction','ask','ech','carpa','emails','stats','params'];
+var currentView='dash';
+function setView(v,focus){
+  currentView=v;
+  VIEWS.forEach(function(n){$('#view-'+n).hidden=n!==v});
+  $$('.nav-item[data-view]').forEach(function(b){if(b.dataset.view===v){b.setAttribute('aria-current','page')}else{b.removeAttribute('aria-current')}});
+  $$('.app-dots .dot').forEach(function(d){d.classList.toggle('on',d.dataset.dot===v)});
+  if(v==='docs'){$('#docList').hidden=false;$('#docAn').hidden=true}
+  if(v==='dossiers'){$('#dossierList').hidden=false;$('#dossierDetail').hidden=true}
+  if(focus)$('#appMain').focus({preventScroll:true});
+}
+function goDemo(){
+  setView('dash');
+  var d=$('#demo');d.scrollIntoView({behavior:reduce?'auto':'smooth'});
+}
+
+/* Délégation des clics */
+document.addEventListener('click',function(e){
+  var t;
+  if((t=e.target.closest('[data-godemo]'))){e.preventDefault();goDemo();return}
+  if((t=e.target.closest('[data-soon]'))){e.preventDefault();var n=t.dataset.soon;toast(t.closest('footer')?'Cette page n\u2019existe pas encore dans le prototype.':'« '+n+' » n\u2019est pas inclus dans cette démonstration.');return}
+  if((t=e.target.closest('[data-view]'))){setView(t.dataset.view,true);return}
+  if((t=e.target.closest('[data-ask]'))){var k=t.dataset.ask;setView('ask');send(ANSWERS[k].q);return}
+  if((t=e.target.closest('[data-analyse]'))){
+    if(t.dataset.analyse==='0'){showAnalysis()}else{toast('Cette démonstration analyse un seul document : le contrat de maintenance Horizon-Nova.')}
+    return}
+  if((t=e.target.closest('[data-goto]'))){
+    if($('#view-docs').hidden||$('#docAn').hidden){openDoc(t.dataset.goto)}else{gotoClause(t.dataset.goto)}
+    return}
+  if(e.target.closest('#agendaBtn')){toggleAgenda();return}
+  if(e.target.closest('#copyNote')){copyNote();return}
+  if(e.target.closest('#backDocs')){$('#docList').hidden=false;$('#docAn').hidden=true;return}
+  if((t=e.target.closest('[data-dossier]'))){setView('dossiers');openDossier(t.dataset.dossier);return}
+  if(e.target.closest('#backDossiers')){$('#dossierList').hidden=false;$('#dossierDetail').hidden=true;return}
+  if((t=e.target.closest('[data-juris]'))){var jk=t.dataset.juris;$('#jurisInput').value=JURIS[jk].label;renderJuris(jk);return}
+  if((t=e.target.closest('[data-email]'))){openEmail(t.dataset.email);return}
+  if(e.target.closest('#backEmails')){$('#emailList').hidden=false;$('#emailDetail').hidden=true;return}
+  if((t=e.target.closest('[data-tgl]'))){t.classList.toggle('on');return}
+});
+$('#chatForm').addEventListener('submit',function(e){e.preventDefault();var i=$('#chatInput');var v=i.value;i.value='';send(v)});
+$('#jurisForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  var v=$('#jurisInput').value.trim();var key=pickJuris(v);
+  if(key){renderJuris(key)}
+  else{$('#jurisResults').innerHTML='<p class="muted" style="margin-top:18px">Cette démonstration répond à trois recherches préparées : pénalité manifestement excessive, reconduction tacite, clause déséquilibrée. Dans Attesto, la recherche porte sur l\u2019ensemble de vos textes et décisions.</p>'}
+});
+
+/* Balayage tactile entre les sections de la démo */
+(function(){
+  var main=$('#appMain'),sx=0,sy=0,dx=0,dy=0,tracking=false;
+  main.addEventListener('touchstart',function(e){
+    if(e.touches.length!==1)return;
+    sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;dy=0;tracking=true;
+  },{passive:true});
+  main.addEventListener('touchmove',function(e){
+    if(!tracking||e.touches.length!==1)return;
+    dx=e.touches[0].clientX-sx;dy=e.touches[0].clientY-sy;
+  },{passive:true});
+  main.addEventListener('touchend',function(){
+    if(!tracking)return;tracking=false;
+    if(Math.abs(dx)<58||Math.abs(dx)<Math.abs(dy)*1.5)return;
+    var i=VIEWS.indexOf(currentView);
+    var ni=dx<0?Math.min(VIEWS.length-1,i+1):Math.max(0,i-1);
+    if(ni!==i)setView(VIEWS[ni]);
+  });
+})();
+
+/* Pièce du hero : inclinaison au pointeur, comme du papier soulevé */
+(function(){
+  var card=$('.dossier');if(!card||reduce)return;
+  var raf=null;
+  card.addEventListener('pointermove',function(e){
+    if(e.pointerType==='touch')return;
+    if(raf)cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(function(){
+      var r=card.getBoundingClientRect();
+      var px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;
+      card.style.transform='perspective(1200px) rotateX('+(py*-6).toFixed(2)+'deg) rotateY('+(px*8).toFixed(2)+'deg)';
+    });
+  });
+  card.addEventListener('pointerleave',function(){card.style.transform=''});
+})();
+
+/* Toast : glisser pour écarter */
+(function(){
+  var el=$('#toast'),sx=0,dx=0,dragging=false;
+  el.addEventListener('touchstart',function(e){dragging=true;sx=e.touches[0].clientX;dx=0;el.style.transition='none'},{passive:true});
+  el.addEventListener('touchmove',function(e){
+    if(!dragging)return;dx=e.touches[0].clientX-sx;
+    el.style.transform='translate(calc(-50% + '+dx+'px),0)';el.style.opacity=String(Math.max(.15,1-Math.abs(dx)/160));
+  },{passive:true});
+  el.addEventListener('touchend',function(){
+    if(!dragging)return;dragging=false;el.style.transition='';
+    if(Math.abs(dx)>90){el.classList.remove('show');clearTimeout(tt)}
+    el.style.transform='';el.style.opacity='';
+  });
+})();
+
+/* Connexion : feuille tactile sur mobile, glisser vers le bas pour fermer */
+(function(){
+  var handle=$('#sheetHandle');if(!handle)return;
+  var sy=0,cy=0,dragging=false;
+  function sheetActive(){return window.matchMedia('(max-width:560px)').matches}
+  handle.addEventListener('click',function(){if(sheetActive())closeAuth()});
+  handle.addEventListener('touchstart',function(e){
+    if(!sheetActive())return;
+    dragging=true;sy=e.touches[0].clientY;cy=sy;dlg.style.transition='none';
+  },{passive:true});
+  handle.addEventListener('touchmove',function(e){
+    if(!dragging)return;cy=e.touches[0].clientY;
+    var d=Math.max(0,cy-sy);dlg.style.transform='translateY('+d+'px)';
+  },{passive:true});
+  handle.addEventListener('touchend',function(){
+    if(!dragging)return;dragging=false;dlg.style.transition='';
+    var d=Math.max(0,cy-sy);
+    if(d>90){closeAuth()}
+    dlg.style.transform='';
+  });
+})();
+
+/* Tarifs : sélecteur mensuel / annuel */
+(function(){
+  var toggle=$('.freq-toggle');if(!toggle)return;
+  var PRICES={pro:{m:'99',a:'84'},cab:{m:'299',a:'254'}};
+  function setFreq(f){
+    $$('.freq-toggle button').forEach(function(b){b.setAttribute('aria-checked',String(b.dataset.freq===f))});
+    $('.freq-thumb').style.transform=f==='a'?'translateX(100%)':'translateX(0)';
+    $('#proAmount').innerHTML=PRICES.pro[f]+' €<small> HT / mois</small>';
+    $('#cabAmount').innerHTML=PRICES.cab[f]+' €<small> HT / mois</small>';
+    $('#proNote').hidden=f!=='a';$('#cabNote').hidden=f!=='a';
+  }
+  toggle.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-freq]');if(!b)return;setFreq(b.dataset.freq);
+  });
+})();
+
+renderDash();renderDocs();renderAnalysis();renderEch();renderDossiers();renderRedaction();renderEmails();renderStats();renderParams();renderCarpaDemo();
+})();
+</script>
+</body>
+</html>
